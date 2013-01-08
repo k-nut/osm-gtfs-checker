@@ -16,4 +16,4 @@ Requirements
 
 License
 -------
-Published under the MIT License. Refer to the license.txt for a copy of the license
+Published under the MIT License. Refer to the LICENSE.txt for a copy of the license.

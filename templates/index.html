@@ -35,6 +35,14 @@ tr:nth-child(even){
 		$(".checkbox input").click(function(){
 			hiderows($(this));
 		});
+		$("#own_area_submit").click(function(){
+			console.log("ok");
+			window.location = "/stops/problemsonly/" 
+						+ $("#north").val() + "/" 
+						+ $("#east").val() + "/" 
+						+ $("#south").val() + "/"
+						+ $("#west").val() 
+		});
 	})
 </script>
 {% endblock %}
@@ -76,28 +84,28 @@ tr:nth-child(even){
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="north">Ost</label>
+					<label class="control-label" for="east">Ost</label>
 					<div class="controls">
-						<input type="text" id="north" placeholder="13.15">
+						<input type="text" id="east" placeholder="13.15">
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="north">Süd</label>
+					<label class="control-label" for="south">Süd</label>
 					<div class="controls">
-						<input type="text" id="north" placeholder="52.25">
+						<input type="text" id="south" placeholder="52.25">
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="north">West</label>
+					<label class="control-label" for="west">West</label>
 					<div class="controls">
-						<input type="text" id="north" placeholder="13.25">
+						<input type="text" id="west" placeholder="13.25">
 					</div>
 				</div>
 			</form>
     	</div>
     	<div class="modal-footer">
-    		<a href="#" class="btn">Schließen</a>
-    		<a href="#" class="btn btn-primary">Los</a>
+    		<a href="#" class="btn" data-dismiss="modal">Schließen</a>
+    		<a href="#" class="btn btn-primary" id=own_area_submit>Los</a>
     	</div>
 </div>
 

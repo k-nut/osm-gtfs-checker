@@ -83,7 +83,7 @@ tr:nth-child(even){
 	<th> {{ stop.lat }}</th>
 	<th> {{ stop.lon }}</th>
 	<th> {{ stop.last_run }}</th>
-	<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&mlon={{ stop.lon }}&zoom=17&layers=M" target="blank">Auf OSM</a></th>
+	<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&amp;mlon={{ stop.lon }}&amp;zoom=17&layers=M" target="blank">Auf OSM</a></th>
 	<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
 </tr>
 {% endfor %}

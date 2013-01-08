@@ -2,6 +2,7 @@
 <html>
 <head>
 <title> Stops in Berlin in OSM </title>
+<link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 {% block head %}
 <style>
@@ -28,20 +29,38 @@ tr:nth-child(even){
 			$("."+element.attr("name")).each(function(){$(this).css("display", "none")});
 		}
 	}
+
+	$(document).ready(function(){
+		$(".checkbox input").click(function(){
+			hiderows($(this));
+		});
+	})
 </script>
 {% endblock %}
 </head>
 <body>
-<h1> Berliner OSM-Haltestellen Validator </h1>
+<div class="navbar">
+	<div class="navbar-inner">
+		<a class="brand">Berliner OSM-Haltestellen Validator</a>
+		<ul class="nav">
+			<li class="active"><a href="/">Start</a>
+			<li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
+		</ul>
+	</div>
+</div>
 {% block content %}
 <p> Prüft auf Basis der Haltestellendaten von <a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein, kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt, oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!</p>
-<p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet (im Moment gibt es noch Probleme mit "S+U" Haltestellen, dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
+<p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet (im Moment gibt es noch Probleme mit "S+U" Haltestellen), dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
 <p> Die Seite wird noch aufgehübscht und der Code kommt natürlich auf gihub. Weiters folgt </p>
 <p> Viel Spaß :) </p>
 <h2> Anzeigekriterien (kann je nach Browser etwas dauern)</h2>
-<input onclick="javascript:hiderows($(this))" type="checkbox" name="match" id="show_match" checked><label for="show_match">Zeige Stationen, die in OSM sind</label>
-<input onclick="javascript:hiderows($(this))" type="checkbox" name="nomatch" id="show_nomatch" checked><label for="show_nomatch">Zeige Stationen, die nicht in OSM sind</label>
-<table>
+<label class="checkbox pull-left">
+	<input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind
+</label>
+<label class="checkbox pull-left">
+	<input type="checkbox" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
+</label>
+<table class=table>
 <tr>
 	<th> Name </th>
 	<th> VBB_id </th>

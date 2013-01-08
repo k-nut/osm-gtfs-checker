@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<title> Stops in Berlin in OSM </title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+{% block head %}
+<style>
+.match{
+	background-color:rgba(57, 216, 57, 0.59);
+}
+.nomatch{
+	background-color:rgba(241, 58, 58, 0.59);
+}
+label{
+	cursor:pointer;
+}
+tr:nth-child(even){
+	border-bottom 2px solid black;
+}
+</style>
+<script>
+	function hiderows(element){
+		if (element.attr("checked")){
+			console.log($("."+element.attr("name")));
+			$("."+element.attr("name")).each(function(){$(this).css("display", "table-row")});
+		}
+		else{
+			$("."+element.attr("name")).each(function(){$(this).css("display", "none")});
+		}
+	}
+</script>
+{% endblock %}
+</head>
+<body>
+<h1> Berliner OSM-Haltestellen Validator </h1>
+{% block content %}
+<p> Prüft auf Basis der Haltestellendaten von <a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein, kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt, oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!</p>
+<p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet (im Moment gibt es noch Probleme mit "S+U" Haltestellen, dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
+<p> Die Seite wird noch aufgehübscht und der Code kommt natürlich auf gihub. Weiters folgt </p>
+<p> Viel Spaß :) </p>
+<h2> Anzeigekriterien (kann je nach Browser etwas dauern)</h2>
+<input onclick="javascript:hiderows($(this))" type="checkbox" name="match" id="show_match" checked><label for="show_match">Zeige Stationen, die in OSM sind</label>
+<input onclick="javascript:hiderows($(this))" type="checkbox" name="nomatch" id="show_nomatch" checked><label for="show_nomatch">Zeige Stationen, die nicht in OSM sind</label>
+<table>
+<tr>
+	<th> Name </th>
+	<th> VBB_id </th>
+	<th> Treffer in OSM </th>
+	<th> Lat </th>
+	<th> Lon </th>
+	<th> Zuletz geprueft </th>
+	<th> Auf OSM Karte </th>
+	<th> Nochmal prüfen </th>
+</tr>
+{% for stop in stops %}
+{% if stop.matches > 0 %}
+<tr class="match">
+{% else %}
+<tr class="nomatch">
+{% endif %}
+	<th> {{ stop.name }}</th>
+	<th> {{ stop.id }}</th>
+	<th> {{ stop.matches }}</th>
+	<th> {{ stop.lat }}</th>
+	<th> {{ stop.lon }}</th>
+	<th> {{ stop.last_run }}</th>
+	<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&mlon={{ stop.lon }}&zoom=17&layers=M" target="blank">Auf OSM</a></th>
+	<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+</body>
+</html>
+

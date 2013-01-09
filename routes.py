@@ -149,14 +149,32 @@ class VBB_Stop():
         south = self.lat + 0.002
         west =  self.lon + 0.002
         short_name = self.name
-        if "(" in self.name: #remove the (Berlin) from the line
+        if "(" in short_name: #remove the (Berlin) from the line
             short_name = short_name.split(" (")[0]
 
         # if we have something like StreetA/StreetB overpass is not able to find this
         # we can just look for StreetB though since we are limiting the search on a small ara
-        if "/" in self.name:
+        if "/" in short_name:
             short_name = short_name.split("/")[1]
-        payload = {"data":'[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;'%(north, east, south, west, short_name)}
+
+        # In Osm "Spandau Bhf" is just "Spandau" so we drop the "Bhf"
+        if "Bhf" in short_name:
+            short_name = short_name.replace(" Bhf", "")
+
+        if "S+U" in short_name:
+            # Stops Like "S+U Wedding" are in OSM as "S Wedding" and "U Wedding"
+            # So we split it up and check for both
+            stop_name = short_name[3:]#Take the part without "S+U"
+            s_station = "S" + stop_name
+            u_station = "U" + stop_name
+            payload = {"data":'[output:json];node(%f, %f, %f,%f);(node["name"~"%s"];node["name"~"%s"];);out skel;' % (north, east, south, west,
+                                   s_station, u_station)}
+            r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
+            this_json = json.loads(r.text)
+            stations = this_json.get("elements")
+            return len(stations)
+
+        payload = {"data":'[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)
         stations = this_json.get("elements")

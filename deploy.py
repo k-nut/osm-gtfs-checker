@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # create tables
-from routes import db
+from models import db
 db.create_all()
 
 # import data

@@ -51,15 +51,6 @@ def recheck(id):
     db.session.commit()
     return redirect(url_for("main"))
 
-@app.route("/nomatch_all")
-def nomatch_all():
-    ''' Return a json file of all stops that are not in OSM '''
-    Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
-    all_stops = []
-    for stop in Stops:
-        all_stops.append(stop.to_dict())
-    return jsonify(stops=all_stops)
-
 @app.route("/map_of_the_bad")
 def map_of_the_bad():
     ''' Return a map with all the stops that aren't in OSM '''

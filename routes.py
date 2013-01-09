@@ -43,13 +43,21 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     return render_template("index.html", stops = result)
 
 @app.route("/recheck/<id>")
-def recheck(id):
+def recheck(id, from_cm_line=False):
     ''' Rerun the checks for a stop and update the db'''
     stop = DB_Stop.query.filter_by(id=id).first()
     stop.matches = VBB_Stop(stop.to_vbb_syntax()).is_in_osm()
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
-    return redirect(url_for("main"))
+    if not from_cm_line:
+        return redirect(url_for("main"))
+    else:
+        if stop.matches > 0:
+            print_success("%s now matches %i stops" % (stop.name,
+                stop.matches));
+        else:
+            print_failure("%s does not match any stops..." % (stop.name))
+        return True
 
 @app.route("/map_of_the_bad")
 def map_of_the_bad():
@@ -83,6 +91,11 @@ def get_trains():
             print Train.line_number + " ist ein(e) " + Train.transit_type
             all_bvg_lines.append(Train.line_number)
     return all_bvg_lines
+
+def recheck_all_missings_stops():
+    Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+    for Stop in Stops:
+        recheck(Stop.id, from_cm_line=True)
 
 def get_stops():
     ''' The initial query to set up the stop db '''

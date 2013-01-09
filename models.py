@@ -38,6 +38,13 @@ class DB_Stop(db.Model):
     def __repr__(self):
         return '<Stop %r>' % self.name
 
+    def to_dict(self):
+        return {
+                "lat": self.lat,
+                "lon": self.lon,
+                "name": self.name
+               }
+
 
 class VBB_Stop():
     ''' Takes a line from the stops.txt and returns a VBB_Stop object '''

@@ -1,1 +1,1 @@
-db_path = "~/stops.db"
+db_path = "./stops.db"

@@ -13,6 +13,14 @@ Requirements
 - flask-sqlalchemy
 - requests
 
+Deploy
+------
+
+To install the dependencies and create the initial database use:
+
+    pip install -r requirements.txt
+    ./deploy.py
+
 License
 -------
 Published under the MIT License. Refer to the LICENSE.txt for a copy of the license.

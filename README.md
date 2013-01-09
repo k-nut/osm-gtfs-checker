@@ -12,7 +12,6 @@ Requirements
 - flask
 - flask-sqlalchemy
 - requests
-- simplejson (one should be able to remove that from the dependencies though)
 
 License
 -------

@@ -22,7 +22,7 @@ function initmap() {
 }
 
 function get_markers() {
-	$.getJSON("/nomatch_all", function(data) {
+	$.getJSON("/api/stops?noMatchesOnly=true", function(data) {
 		$.each(data.stops, function(){
 			new_marker(this.lat, this.lon, this.name);
 		});

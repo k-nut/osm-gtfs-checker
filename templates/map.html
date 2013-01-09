@@ -14,7 +14,7 @@ function initmap() {
         // create the tile layer with correct attribution
         var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data Â© OpenStreetMap contributors';
-        var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 18, attribution: osmAttrib});		
+        var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 18, attribution: osmAttrib});
 
         // start the map in South-East England
         map.setView(new L.LatLng(52.52, 13.41),13);
@@ -22,17 +22,34 @@ function initmap() {
 }
 
 function get_markers() {
-	$.getJSON("/nomatch_all", function(data) {
+	$.getJSON("/api/stops?noMatchesOnly=true", function(data) {
 		$.each(data.stops, function(){
-			new_marker(this.lat, this.lon, this.name);
+			new_marker(this);
 		});
-		console.log(data);
-        });
+    });
 }
 
-function new_marker(lat, lon, name){
-	var this_marker = L.marker([lat, lon]);
-	this_marker.bindPopup(name);
+var BusIcon = L.Icon.extend({
+    options: {
+        iconUrl: './static/img/bus-black.svg',
+        iconSize: [24, 24]
+    }
+});
+
+function new_marker(stop){
+    var this_marker;
+    if(stop.matches >= 1) {
+        this_marker = new L.marker(
+            [stop.lat, stop.lon],
+            { icon: new BusIcon() }
+        );
+    } else {
+        this_marker = new L.marker(
+            [stop.lat, stop.lon],
+            { icon: new BusIcon({iconUrl: './static/img/bus-red.svg'}) }
+        );
+    }
+	this_marker.bindPopup(stop.name);
 	this_marker.addTo(map);
 }
 

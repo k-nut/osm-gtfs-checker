@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask import Flask, redirect, url_for, \
-        render_template, jsonify
+        render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 import os
@@ -64,6 +64,21 @@ def nomatch_all():
 def map_of_the_bad():
     ''' Return a map with all the stops that aren't in OSM '''
     return render_template("map.html")
+
+@app.route("/api/stops")
+def api_stops():
+
+    if request.args.get("matchesOnly"):
+        Stops = DB_Stop.query.filter(DB_Stop.matches >= 1).all()
+    elif request.args.get("noMatchesOnly"):
+        Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+    else:
+        Stops = DB_Stop.query.all()
+
+    all_stops = []
+    for stop in Stops:
+        all_stops.append(stop.to_dict())
+    return jsonify(stops=all_stops)
 
 def get_trains():
     ''' The initial query to set up the train db '''

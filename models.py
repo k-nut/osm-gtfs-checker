@@ -42,7 +42,8 @@ class DB_Stop(db.Model):
         return {
                 "lat": self.lat,
                 "lon": self.lon,
-                "name": self.name
+                "name": self.name,
+                "matches": self.matches
                }
 
 

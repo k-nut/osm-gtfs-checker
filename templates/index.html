@@ -23,12 +23,19 @@ tr:nth-child(even){
 <script>
 	function hiderows(element){
 		if (element.attr("checked")){
-			console.log($("."+element.attr("name")));
 			$("."+element.attr("name")).each(function(){$(this).css("display", "table-row")});
 		}
 		else{
 			$("."+element.attr("name")).each(function(){$(this).css("display", "none")});
 		}
+		count();
+	}
+
+	function count(){
+		var total_stops = $("tr").length;
+		var missing_stops = $(".nomatch").length;
+		$("#total").text(total_stops);
+		$("#nomatch_total").text(missing_stops);
 	}
 
 	$(document).ready(function(){
@@ -36,13 +43,14 @@ tr:nth-child(even){
 			hiderows($(this));
 		});
 		$("#own_area_submit").click(function(){
-			console.log("ok");
+			count();
 			window.location = "/stops/problemsonly/" 
 						+ $("#north").val() + "/" 
 						+ $("#east").val() + "/" 
 						+ $("#south").val() + "/"
 						+ $("#west").val() 
 		});
+		count();
 	})
 </script>
 {% endblock %}
@@ -69,6 +77,8 @@ tr:nth-child(even){
 <label class="checkbox pull-left">
 	<input type="checkbox" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
 </label>
+<br />
+<p> Insgesamt <span id="total"> 0 </span> Haltestellen. Davon <span id="nomatch_total"> 0 </span> nicht gefunden.
 
 <div id="own_area_modal" class="modal hide fade">
 	<div class="modal-header">
@@ -108,7 +118,6 @@ tr:nth-child(even){
     		<a href="#" class="btn btn-primary" id=own_area_submit>Los</a>
     	</div>
 </div>
-
 
 
 

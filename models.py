@@ -123,11 +123,11 @@ class Bvg_line():
         else:
             self.transit_type = self.agency
 
-        def is_in_osm():
-            payload = {"data":'[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
-            r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-            if "tags" in r.text:
-                return r.text.split('"name": "')[1].split('"')[0]
-            else:
-                return False
+    def is_in_osm(self):
+        payload = {"data":'[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
+        r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
+        if "tags" in r.text:
+            return r.text.split('"name": "')[1].split('"')[0]
+        else:
+            return False
 

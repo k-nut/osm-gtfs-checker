@@ -32,7 +32,7 @@ tr:nth-child(even){
 	}
 
 	function count(){
-		var total_stops = $("tr").length;
+		var total_stops = $("tr").length-1;
 		var missing_stops = $(".nomatch").length;
 		$("#total").text(total_stops);
 		$("#nomatch_total").text(missing_stops);

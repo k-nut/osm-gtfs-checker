@@ -88,9 +88,14 @@ def get_trains():
     for line in text:
         Train = Bvg_line(line)
         if Train.operator in ["BVG", "DB"]:
-            print Train.line_number + " ist ein(e) " + Train.transit_type
-            all_bvg_lines.append(Train.line_number)
-    return all_bvg_lines
+            feedback = Train.is_in_osm()
+            if feedback:
+                print_success(feedback)
+            else:
+                print_failure(Train.line_number + " is not in OSM")
+    #        print Train.line_number + " ist ein(e) " + Train.transit_type
+    #        all_bvg_lines.append(Train.line_number)
+    #return all_bvg_lines
 
 def recheck_all_missings_stops():
     Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()

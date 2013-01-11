@@ -9,7 +9,7 @@ import os
 
 import config
 
-from models import DB_Stop, VBB_Stop, Bvg_line, app, db
+from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
 
 @app.route("/")
 def main():
@@ -93,9 +93,9 @@ def get_trains():
                 print_success(feedback)
             else:
                 print_failure(Train.line_number + " is not in OSM")
-    #        print Train.line_number + " ist ein(e) " + Train.transit_type
-    #        all_bvg_lines.append(Train.line_number)
-    #return all_bvg_lines
+            db_rep = DB_Train()
+            db.session.add(new_stop)
+            db.session.commit()
 
 def recheck_all_missings_stops():
     Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()

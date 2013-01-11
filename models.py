@@ -14,6 +14,22 @@ path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 db = SQLAlchemy(app)
 
+class Agency(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256))
+    url = db.Column(db.String(256))
+    timezone = db.Column(db.String(256))
+
+    def __init__(self, id, name, url, timezone):
+        self.id = id
+        self.name = name
+        self.url = url
+        self.timezone = timezone
+
+    def __repr__(self):
+        rep =  "<Agency> %s, [%i]" % (self.name, self.id)
+        return rep.encode("utf-8")
+
 class DB_Stop(db.Model):
     ''' The represenation of a stop in the database '''
     id = db.Column(db.Integer, primary_key=True)
@@ -130,4 +146,18 @@ class Bvg_line():
             return r.text.split('"name": "')[1].split('"')[0]
         else:
             return False
+
+class DB_Train():
+    id = db.Column(db.Integer, primary_key = True)
+    agency = db.Column(db.String(200))
+    operator = db.Column(db.String(200))
+    transit_type = db.Column(db.String(200))
+    in_osm = db.Column(db.Boolean)
+
+    def __init__(self, vbb_id, agency, operator, transit_type, in_osm):
+        self.id = id;
+        self.agency = agency
+        self.operator = operator
+        self.transit_type = transit_type
+        self.in_osm = in_osm
 

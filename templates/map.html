@@ -31,7 +31,7 @@ function get_markers() {
 
 var BusIcon = L.Icon.extend({
     options: {
-        iconUrl: './static/img/bus-black.svg',
+        iconUrl: './static/img/bus-black.png',
         iconSize: [24, 24]
     }
 });
@@ -46,7 +46,7 @@ function new_marker(stop){
     } else {
         this_marker = new L.marker(
             [stop.lat, stop.lon],
-            { icon: new BusIcon({iconUrl: './static/img/bus-red.svg'}) }
+            { icon: new BusIcon({iconUrl: './static/img/bus-red.png'}) }
         );
     }
 	this_marker.bindPopup(stop.name);

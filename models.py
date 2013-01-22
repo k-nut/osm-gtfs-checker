@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 import requests
 
 from flask import Flask, json
@@ -14,6 +17,7 @@ path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 db = SQLAlchemy(app)
 
+
 class Agency(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
@@ -27,8 +31,9 @@ class Agency(db.Model):
         self.timezone = timezone
 
     def __repr__(self):
-        rep =  "<Agency> %s, [%i]" % (self.name, self.id)
+        rep = "<Agency> %s, [%i]" % (self.name, self.id)
         return rep.encode("utf-8")
+
 
 class DB_Stop(db.Model):
     ''' The represenation of a stop in the database '''
@@ -78,40 +83,40 @@ class VBB_Stop():
         ''' Call Overpass to see if there is an object with the given name
             close to the cordinates given '''
         north = self.lat - 0.002
-        east =  self.lon - 0.002
+        east = self.lon - 0.002
         south = self.lat + 0.002
-        west =  self.lon + 0.002
+        west = self.lon + 0.002
         short_name = self.name
-        if "(" in short_name: #remove the (Berlin) from the line
+        if "(" in short_name:  # remove the (Berlin) from the line
             short_name = short_name.split(" (")[0]
 
         # if we have something like StreetA/StreetB overpass is not able to find this
-        # we can just look for StreetB though since we are limiting the search on a small ara
+        # we can just look for StreetB or StreetA though since we are limiting the search on a small ara
         if "/" in short_name:
-            short_name = short_name.split("/")[1]
+            short_name = short_name.replace("/", "|")
 
         # In Osm "Spandau Bhf" is just "Spandau" so we drop the "Bhf"
         if "Bhf" in short_name:
             short_name = short_name.replace(" Bhf", "")
 
+        if "Str." in short_name:
+            parts = short_name.split("Str.")
+            short_name = short_name + "|" + parts[0] + u"Straße"
+
         if "S+U" in short_name:
             # Stops Like "S+U Wedding" are in OSM as "S Wedding" and "U Wedding"
             # So we split it up and check for both
-            stop_name = short_name[3:]#Take the part without "S+U"
+            stop_name = short_name[3:]  # Take the part without "S+U"
             s_station = "S" + stop_name
             u_station = "U" + stop_name
-            payload = {"data":'[output:json];node(%f, %f, %f,%f);(node["name"~"%s"];node["name"~"%s"];);out skel;' % (north, east, south, west,
-                                   s_station, u_station)}
-            r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-            this_json = json.loads(r.text)
-            stations = this_json.get("elements")
-            return len(stations)
-
+            short_name = s_station + "|" + u_station
+        print short_name
         payload = {"data":'[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)
         stations = this_json.get("elements")
         return len(stations)
+
 
 class Bvg_line():
     ''' Takes a line from routes.txt and return a Bvg_line object '''
@@ -147,17 +152,17 @@ class Bvg_line():
         else:
             return False
 
+
 class DB_Train():
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     agency = db.Column(db.String(200))
     operator = db.Column(db.String(200))
     transit_type = db.Column(db.String(200))
     in_osm = db.Column(db.Boolean)
 
     def __init__(self, vbb_id, agency, operator, transit_type, in_osm):
-        self.id = id;
+        self.id = id
         self.agency = agency
         self.operator = operator
         self.transit_type = transit_type
         self.in_osm = in_osm
-

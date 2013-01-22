@@ -95,7 +95,7 @@ def get_trains():
             else:
                 print_failure(Train.line_number + " is not in OSM")
             db_rep = DB_Train()
-            db.session.add(new_stop)
+            db.session.add(db_rep)
             db.session.commit()
 
 

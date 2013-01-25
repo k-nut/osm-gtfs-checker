@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 import requests
 from flask import redirect, url_for, \
@@ -125,15 +125,15 @@ def get_stops():
                     print_success(Stop.name + ": " + str(feedback))
                 else:
                     print_failure(Stop.name + ":  0")
-                    new_stop = DB_Stop(
-                        name=Stop.name,
-                        lat=Stop.lat,
-                        lon=Stop.lon,
-                        matches=feedback,
-                        vbb_id=Stop.stop_id
-                    )
-                    db.session.add(new_stop)
-                    db.session.commit()
+                new_stop = DB_Stop(
+                    name=Stop.name,
+                    lat=Stop.lat,
+                    lon=Stop.lon,
+                    matches=feedback,
+                    vbb_id=Stop.stop_id
+                )
+                db.session.add(new_stop)
+                db.session.commit()
 
 
 def print_success(message):

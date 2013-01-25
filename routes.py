@@ -105,6 +105,12 @@ def recheck_all_missings_stops():
         recheck(Stop.id, from_cm_line=True)
 
 
+def recheck_all():
+    Stops = DB_Stop.query.all()
+    for Stop in Stops:
+        recheck(Stop.id, from_cm_line=True)
+
+
 def get_stops():
     ''' The initial query to set up the stop db '''
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"

@@ -54,7 +54,7 @@ class DB_Stop(db.Model):
 
     def to_vbb_syntax(self):
         ''' Return a line that looks as if it comes from the routes.txt '''
-        return '%i,,"%s",,%f,%f' % (self.id, self.name, self.lat, self.lon)
+        return u'%i,,"%s",,%f,%f' % (self.id, self.name, self.lat, self.lon)
 
     def __repr__(self):
         return '<Stop %r>' % self.name
@@ -110,7 +110,8 @@ class VBB_Stop():
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
-        print short_name
+        # print short_name  This will break due to unicode conversions further
+        # investigation is needed ;)
         payload = {"data":'[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)

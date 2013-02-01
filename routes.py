@@ -20,9 +20,11 @@ def pagination(number):
     number = int(number)
     start = (number-1)*50
     stop = number * 50
-    pages = DB_Stop.query.count()/50
+    matches = DB_Stop.query.filter(DB_Stop.matches > 0).count()
+    all_stops = DB_Stop.query.count()
     Stops = DB_Stop.query.order_by("last_run desc").slice(start, stop)
-    return render_template("index.html", stops=Stops, pages=pages, this_page=number)
+    return render_template("index.html", stops=Stops, pages=all_stops,
+            this_page=number, matches_count=matches)
 
 
 @app.route("/search/<query>")

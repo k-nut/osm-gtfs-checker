@@ -78,10 +78,12 @@
         <p> Prüft auf Basis der Haltestellendaten von <a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein, kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt, oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!</p>
         <p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet <span style="text-decoration:line-through;">(im Moment gibt es noch Probleme mit "S+U" Haltestellen)</span>, dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
         <p> Viel Spaß :) </p>
+        {% if pages %}
         <h2>Statistik</h2>
             Insgesamt: {{ pages  }}
             In OSM: {{ matches_count }}
             Nicht in OSM: {{ pages - matches_count }}
+        {% endif %}
         <h2> Anzeigekriterien</h2>
         <label class="checkbox pull-left">
             <input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind

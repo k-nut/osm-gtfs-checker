@@ -11,8 +11,25 @@ from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
 @app.route("/")
 def main():
     ''' The main page '''
-    Stops = DB_Stop.query.all()
-    return render_template("index.html", stops=Stops)
+    return pagination(1)
+
+
+@app.route("/page/<number>")
+def pagination(number):
+    """ Render only 100 stops for better overview"""
+    number = int(number)
+    start = (number-1)*50
+    stop = number * 50
+    pages = DB_Stop.query.count()/50
+    Stops = DB_Stop.query.order_by("last_run desc").slice(start, stop)
+    return render_template("index.html", stops=Stops, pages=pages, this_page=number)
+
+
+@app.route("/search/<query>")
+def search(query):
+    """ Return a list with all the stops that match the query"""
+    Stops = DB_Stop.query.filter(DB_Stop.name.like("%" + query + "%")).all()
+    return render_template("index.html", stops=Stops, pages=False)
 
 
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")

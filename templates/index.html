@@ -1,157 +1,190 @@
 <!doctype html>
 <html>
-<head>
-<title> Stops in Berlin in OSM </title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<script src="/static/js/bootstrap.js"></script>
-{% block head %}
-<style>
-.match{
-	background-color:rgba(57, 216, 57, 0.59);
-}
-.nomatch{
-	background-color:rgba(241, 58, 58, 0.59);
-}
-label{
-	cursor:pointer;
-}
-tr:nth-child(even){
-	border-bottom 2px solid black;
-}
-</style>
-<script>
-	function hiderows(element){
-		if (element.attr("checked")){
-			$("."+element.attr("name")).each(function(){$(this).css("display", "table-row")});
-		}
-		else{
-			$("."+element.attr("name")).each(function(){$(this).css("display", "none")});
-		}
-		count();
-	}
+    <head>
+        <title> Stops in Berlin in OSM </title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <script src="/static/js/bootstrap.js"></script>
+        {% block head %}
+        <style>
+            .match{
+                background-color:rgba(57, 216, 57, 0.59);
+            }
+            .nomatch{
+                background-color:rgba(241, 58, 58, 0.59);
+            }
+            label{
+                cursor:pointer;
+            }
+            tr:nth-child(even){
+                border-bottom 2px solid black;
+            }
+        </style>
+        <script>
+            function hiderows(element){
+                if (element.attr("checked")){
+                    $("."+element.attr("name")).each(function(){$(this).css("display", "table-row")});
+                }
+                else{
+                    $("."+element.attr("name")).each(function(){$(this).css("display", "none")});
+                }
+                count();
+            }
 
-	function count(){
-		var total_stops = $("tr").length-1;
-		var missing_stops = $(".nomatch").length;
-		$("#total").text(total_stops);
-		$("#nomatch_total").text(missing_stops);
-	}
+            function count(){
+                var total_stops = $("tr").length-1;
+                var missing_stops = $(".nomatch").length;
+                $("#total").text(total_stops);
+                $("#nomatch_total").text(missing_stops);
+            }
 
-	$(document).ready(function(){
-		$(".checkbox input").click(function(){
-			hiderows($(this));
-		});
-		$("#own_area_submit").click(function(){
-			count();
-			window.location = "/stops/problemsonly/" 
-						+ $("#north").val() + "/" 
-						+ $("#east").val() + "/" 
-						+ $("#south").val() + "/"
-						+ $("#west").val() 
-		});
-		count();
-	})
-</script>
-{% endblock %}
-</head>
-<body>
-<div class="navbar">
-	<div class="navbar-inner">
-		<a class="brand">Berliner OSM-Haltestellen Validator</a>
-		<ul class="nav">
-			<li class="active"><a href="/">Start</a>
-			<li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
-			<li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
-		</ul>
-	</div>
-</div>
-{% block content %}
-<p> Prüft auf Basis der Haltestellendaten von <a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein, kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt, oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!</p>
-<p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet <span style="text-decoration:line-through;">(im Moment gibt es noch Probleme mit "S+U" Haltestellen)</span>, dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
-<p> Viel Spaß :) </p>
-<h2> Anzeigekriterien (kann je nach Browser etwas dauern)</h2>
-<label class="checkbox pull-left">
-	<input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind
-</label>
-<label class="checkbox pull-left">
-	<input type="checkbox" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
-</label>
-<br />
-<p> Insgesamt <span id="total"> 0 </span> Haltestellen. Davon <span id="nomatch_total"> 0 </span> nicht gefunden.
+            function search(){
+                var query = $("#search").val();
+                window.location = "/search/" + query;
+            }
 
-<div id="own_area_modal" class="modal hide fade">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    		<h3>Eigenen Bereich festlegen</h3>
-    	</div>
-    	<div class="modal-body">
-			<form class="form-horizontal">
-				<div class="control-group">
-					<label class="control-label" for="north">Nord</label>
-					<div class="controls">
-						<input type="text" id="north" placeholder="52.15">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="east">Ost</label>
-					<div class="controls">
-						<input type="text" id="east" placeholder="13.15">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="south">Süd</label>
-					<div class="controls">
-						<input type="text" id="south" placeholder="52.25">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="west">West</label>
-					<div class="controls">
-						<input type="text" id="west" placeholder="13.25">
-					</div>
-				</div>
-			</form>
-    	</div>
-    	<div class="modal-footer">
-    		<a href="#" class="btn" data-dismiss="modal">Schließen</a>
-    		<a href="#" class="btn btn-primary" id=own_area_submit>Los</a>
-    	</div>
-</div>
+            $(document).ready(function(){
+                $(".checkbox input").click(function(){
+                    hiderows($(this));
+                });
+                $("#own_area_submit").click(function(){
+                    count();
+                    window.location = "/stops/problemsonly/" 
+                    + $("#north").val() + "/" 
+                    + $("#east").val() + "/" 
+                    + $("#south").val() + "/"
+                    + $("#west").val() 
+                });
+                count();
+            })
+        </script>
+        {% endblock %}
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand">Berliner OSM-Haltestellen Validator</a>
+                <ul class="nav">
+                    <li class="active"><a href="/">Start</a>
+                    <li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
+                    <li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
+                </ul>
+                <form class="navbar-search pull-right" action="javascript:search()">
+                        <input class="search-query" id="search" type="search" placeholder="Haltestellen suchen..." />
+                </form>
+            </div>
+        </div>
+        {% block content %}
+        <p> Prüft auf Basis der Haltestellendaten von <a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein, kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt, oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!</p>
+        <p> Wenn ihr Fehler im Programm oder Falscheinstufungen findet <span style="text-decoration:line-through;">(im Moment gibt es noch Probleme mit "S+U" Haltestellen)</span>, dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.</p>
+        <p> Viel Spaß :) </p>
+        <h2> Anzeigekriterien (kann je nach Browser etwas dauern)</h2>
+        <label class="checkbox pull-left">
+            <input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind
+        </label>
+        <label class="checkbox pull-left">
+            <input type="checkbox" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
+        </label>
+        <br />
+        {% if pages %}
+        <div class="pagination pagination-centered">
+            <ul>
+                <li><a href="{{ this_page-1 }}">Zurück</a></li>
+                {% if this_page-5 > 0 -%}
+                        <li><a href="/page/1">1</a></li>
+                        <li class="disabled"><a href="#">...</a></li>
+                {%- endif %}
+                {% for page_number in range(1, pages) -%}
+                        {% if page_number == this_page -%}
+                                <li class="active"><a href="/page/{{ page_number }}">{{ page_number }}</a></li>
+                        {% else -%}
+                                {% if this_page - page_number < 5 and this_page - page_number > -5 %} 
+                                        <li><a href="/page/{{ page_number }}">{{ page_number }}</a></li>
+                                {% endif %}
+                        {%- endif %}
+                {%- endfor %}
+                {% if this_page+5 < pages -%}
+                        <li class="disabled"><a href="#">...</a></li>
+                        <li><a href="/page/{{ pages }}">{{ pages }}</a></li>
+                {%- endif %}
+                <li><a href="{{ this_page+1 }}">Vor</a></li>
+            </ul>
+        </div>
+        {% endif %}
+        <p> Insgesamt <span id="total"> 0 </span> Haltestellen. Davon <span id="nomatch_total"> 0 </span> nicht gefunden.
+
+        <div id="own_area_modal" class="modal hide fade">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Eigenen Bereich festlegen</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="north">Nord</label>
+                        <div class="controls">
+                            <input type="text" id="north" placeholder="52.15">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="east">Ost</label>
+                        <div class="controls">
+                            <input type="text" id="east" placeholder="13.15">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="south">Süd</label>
+                        <div class="controls">
+                            <input type="text" id="south" placeholder="52.25">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="west">West</label>
+                        <div class="controls">
+                            <input type="text" id="west" placeholder="13.25">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">Schließen</a>
+                <a href="#" class="btn btn-primary" id=own_area_submit>Los</a>
+            </div>
+        </div>
 
 
 
 
-<table class=table>
-<tr>
-	<th> Name(VBB) </th>
-	<th> VBB_id </th>
-	<th> Treffer in OSM </th>
-	<th> Lat (VBB) </th>
-	<th> Lon (VBB) </th>
-	<th> Zuletz geprueft </th>
-	<th> Auf OSM Karte </th>
-	<th> Nochmal prüfen </th>
-</tr>
-{% for stop in stops %}
-{% if stop.matches > 0 %}
-<tr class="match">
-{% else %}
-<tr class="nomatch">
-{% endif %}
-	<th> {{ stop.name }}</th>
-	<th> {{ stop.id }}</th>
-	<th> {{ stop.matches }}</th>
-	<th> {{ stop.lat }}</th>
-	<th> {{ stop.lon }}</th>
-	<th> {{ stop.last_run }}</th>
-	<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&amp;mlon={{ stop.lon }}&amp;zoom=17&amp;layers=T" target="blank">Position laut VBB</a></th>
-	<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
-</tr>
-{% endfor %}
-</table>
-{% endblock %}
-<a href="https://github.com/k-nut/osm-vbb-checker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-</body>
-</html>
+        <table class=table>
+            <tr>
+                <th> Name(VBB) </th>
+                <th> VBB_id </th>
+                <th> Treffer in OSM </th>
+                <th> Lat (VBB) </th>
+                <th> Lon (VBB) </th>
+                <th> Zuletz geprueft </th>
+                <th> Auf OSM Karte </th>
+                <th> Nochmal prüfen </th>
+            </tr>
+            {% for stop in stops %}
+            {% if stop.matches > 0 %}
+            <tr class="match">
+                {% else %}
+                <tr class="nomatch">
+                    {% endif %}
+                    <th> {{ stop.name }}</th>
+                    <th> {{ stop.id }}</th>
+                    <th> {{ stop.matches }}</th>
+                    <th> {{ stop.lat }}</th>
+                    <th> {{ stop.lon }}</th>
+                    <th> {{ stop.last_run }}</th>
+                    <th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&amp;mlon={{ stop.lon }}&amp;zoom=17&amp;layers=T" target="blank">Position laut VBB</a></th>
+                    <th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endblock %}
+            <a href="https://github.com/k-nut/osm-vbb-checker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+        </body>
+    </html>
 

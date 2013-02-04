@@ -149,7 +149,7 @@ def get_stops():
     for line in text:
         if len(line) > 1:
             Stop = VBB_Stop(line)
-            if "Berlin" in Stop.name:
+            if "Berlin" in Stop.name or "Cottbus, " in Stop.name:
                 feedback = Stop.is_in_osm()
                 if feedback > 0:
                     print_success(Stop.name + ": " + str(feedback))

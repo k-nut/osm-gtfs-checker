@@ -43,6 +43,12 @@
                 window.location = "/search/" + query;
             }
 
+            function change_landkreis(){
+                var landkreis = $("#landkreis-picker").val();
+                window.location = "/city/" + landkreis + "/page/1"
+                console.log(landkreis);
+            }
+
             $(document).ready(function(){
                 $(".checkbox input").click(function(){
                     hiderows($(this));
@@ -84,6 +90,15 @@
             In OSM: {{ matches_count }}
             Nicht in OSM: {{ pages - matches_count }}
         {% endif %}
+        <h2> Landkreis wechseln </h2>
+        <form action="javascript:change_landkreis();">
+            <select id="landkreis-picker" name="landkreis">
+                <option value="Berlin">Berlin</option>
+                <option value="Cottbus">Cottbus</option>
+            </select>
+            <input type="submit">
+        </form>
+
         <h2> Anzeigekriterien</h2>
         <label class="checkbox pull-left">
             <input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind
@@ -97,21 +112,21 @@
             <ul>
                 <li><a href="{{ this_page-1 }}">Zurück</a></li>
                 {% if this_page-5 > 0 -%}
-                        <li><a href="/page/1">1</a></li>
+                        <li><a href="1">1</a></li>
                         <li class="disabled"><a href="#">...</a></li>
                 {%- endif %}
                 {% for page_number in range(1, (pages/50)|int) -%}
                         {% if page_number == this_page -%}
-                                <li class="active"><a href="/page/{{ page_number }}">{{ page_number }}</a></li>
+                            <li class="active"><a href="{{ page_number }}">{{ page_number }}</a></li>
                         {% else -%}
-                                {% if this_page - page_number < 5 and this_page - page_number > -5 %} 
-                                        <li><a href="/page/{{ page_number }}">{{ page_number }}</a></li>
-                                {% endif %}
+                            {% if this_page - page_number < 5 and this_page - page_number > -5 %} 
+                                <li><a href="{{ page_number }}">{{ page_number }}</a></li>
+                            {% endif %}
                         {%- endif %}
                 {%- endfor %}
                 {% if this_page+5 < pages -%}
                         <li class="disabled"><a href="#">...</a></li>
-                        <li><a href="/page/{{ pages }}">{{ pages }}</a></li>
+                        <li><a href="{{ (pages/50)|int }}">{{ (pages/50)|int }}</a></li>
                 {%- endif %}
                 <li><a href="{{ this_page+1 }}">Vor</a></li>
             </ul>

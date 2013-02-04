@@ -6,6 +6,7 @@ from flask import redirect, url_for, \
 import datetime
 
 from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
+from helpers import print_success, print_failure
 
 
 @app.route("/")
@@ -14,17 +15,27 @@ def main():
     return pagination(1)
 
 
-@app.route("/page/<number>")
-def pagination(number):
+@app.route("/city/<city>/page/<number>")
+def pagination(number, city="Cottbus"):
     """ Render only 100 stops for better overview"""
     number = int(number)
     start = (number-1)*50
     stop = number * 50
-    matches = DB_Stop.query.filter(DB_Stop.matches > 0).count()
-    all_stops = DB_Stop.query.count()
-    Stops = DB_Stop.query.order_by("last_run desc").slice(start, stop)
-    return render_template("index.html", stops=Stops, pages=all_stops,
-            this_page=number, matches_count=matches)
+    matches = DB_Stop.query.filter(
+        DB_Stop.landkreis == city,
+        DB_Stop.matches > 0
+    ).count()
+    all_stops = DB_Stop.query.filter(DB_Stop.landkreis == city).count()
+    Stops = DB_Stop.query \
+        .filter(DB_Stop.landkreis == city) \
+        .order_by("last_run desc") \
+        .slice(start, stop)
+    return render_template("index.html",
+                           stops=Stops,
+                           pages=all_stops,
+                           this_page=number,
+                           matches_count=matches,
+                           )
 
 
 @app.route("/search/<query>")
@@ -138,7 +149,7 @@ def get_stops():
     for line in text:
         if len(line) > 1:
             Stop = VBB_Stop(line)
-            if "(Berlin)" in Stop.name:
+            if "Berlin" in Stop.name:
                 feedback = Stop.is_in_osm()
                 if feedback > 0:
                     print_success(Stop.name + ": " + str(feedback))
@@ -153,16 +164,6 @@ def get_stops():
                 )
                 db.session.add(new_stop)
                 db.session.commit()
-
-
-def print_success(message):
-    ''' Print the message in green '''
-    print '\033[1;32m%s\033[1;m' % (message)
-
-
-def print_failure(message):
-    ''' Print the message in red '''
-    print '\033[1;31m%s\033[1;m' % (message)
 
 
 if __name__ == "__main__":

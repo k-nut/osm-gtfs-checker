@@ -12,6 +12,8 @@ import os
 import re
 import datetime
 
+from helpers import get_landkreis
+
 app = Flask(__name__, instance_relative_config=True)
 path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
@@ -43,6 +45,7 @@ class DB_Stop(db.Model):
     matches = db.Column(db.Float)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
+    landkreis = db.Column(db.String)
 
     def __init__(self, vbb_id, name, lat, lon, matches):
         self.id = vbb_id
@@ -51,6 +54,13 @@ class DB_Stop(db.Model):
         self.lon = lon
         self.matches = int(matches)
         self.last_run = datetime.datetime.now().replace(microsecond=0)
+        kreise = get_landkreis(lat, lon)
+        if 6 in kreise:
+            self.landkreis = kreise[6]
+        elif 4 in kreise:
+            self.landkreis = kreise[4]
+        else:
+            self.landkresi = "Unknown"
 
     def to_vbb_syntax(self):
         ''' Return a line that looks as if it comes from the routes.txt '''
@@ -61,17 +71,17 @@ class DB_Stop(db.Model):
 
     def to_dict(self):
         return {
-                "lat": self.lat,
-                "lon": self.lon,
-                "name": self.name,
-                "matches": self.matches
-               }
+            "lat": self.lat,
+            "lon": self.lon,
+            "name": self.name,
+            "matches": self.matches
+        }
 
 
 class VBB_Stop():
     ''' Takes a line from the stops.txt and returns a VBB_Stop object '''
     def __init__(self, line_from_stops_txt):
-        #since csvreader doesnt understand unicode we'll just use good old regex
+        #since csvreader doesnt understand unicode we'll just use good ol regex
         pattern = re.compile('(\d*),,"(.*)",,(\d*\.\d*),(\d*\.\d*)')
         fields = re.findall(pattern, line_from_stops_txt)[0]
         self.stop_id = fields[0]
@@ -89,6 +99,8 @@ class VBB_Stop():
         short_name = self.name
         if "(" in short_name:  # remove the (Berlin) from the line
             short_name = short_name.split(" (")[0]
+
+        short_name = short_name.replace("Cottbus, ", "")
 
         # if we have something like StreetA/StreetB overpass is not able to find this
         # we can just look for StreetB or StreetA though since we are limiting the search on a small ara
@@ -110,9 +122,9 @@ class VBB_Stop():
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
-        # print short_name  This will break due to unicode conversions further
+        print short_name # This will break due to unicode conversions further
         # investigation is needed ;)
-        payload = {"data":'[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
+        payload = {"data": '[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)
         stations = this_json.get("elements")

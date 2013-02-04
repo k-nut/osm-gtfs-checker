@@ -16,7 +16,7 @@ def main():
 
 
 @app.route("/city/<city>/page/<number>")
-def pagination(number, city="Cottbus"):
+def pagination(number, city="Berlin"):
     """ Render only 100 stops for better overview"""
     number = int(number)
     start = (number-1)*50

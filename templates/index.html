@@ -69,7 +69,7 @@
     <body>
         <div class="navbar">
             <div class="navbar-inner">
-                <a class="brand">Berliner OSM-Haltestellen Validator</a>
+                <a class="brand">Berliner &amp; Brandenburger OSM-Haltestellen Validator</a>
                 <ul class="nav">
                     <li class="active"><a href="/">Start</a>
                     <li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
@@ -93,8 +93,9 @@
         <h2> Landkreis wechseln </h2>
         <form action="javascript:change_landkreis();">
             <select id="landkreis-picker" name="landkreis">
-                <option value="Berlin">Berlin</option>
-                <option value="Cottbus">Cottbus</option>
+                {% for landkreis in landkreise %}
+                <option value="{{ landkreis }}">{{ landkreis }}</option>
+                {% endfor %}
             </select>
             <input type="submit">
         </form>

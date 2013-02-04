@@ -30,11 +30,13 @@ def pagination(number, city="Cottbus"):
         .filter(DB_Stop.landkreis == city) \
         .order_by("last_run desc") \
         .slice(start, stop)
+    landkreise = set([stop.landkreis for stop in DB_Stop.query.all()])
     return render_template("index.html",
                            stops=Stops,
                            pages=all_stops,
                            this_page=number,
                            matches_count=matches,
+                           landkreise=landkreise
                            )
 
 

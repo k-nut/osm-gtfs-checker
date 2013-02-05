@@ -91,7 +91,7 @@
         <form action="javascript:change_landkreis();">
             <select id="landkreis-picker" name="landkreis">
                 {% for landkreis in landkreise %}
-                <option value="{{ landkreis }}">{{ landkreis }}</option>
+                <option {% if landkreis==city %} selected {% endif %} value="{{ landkreis }}">{{ landkreis }}</option>
                 {% endfor %}
             </select>
             <input type="submit">

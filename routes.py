@@ -147,13 +147,15 @@ def recheck_all():
 
 def get_stops():
     ''' The initial query to set up the stop db '''
+    all_stops = DB_Stop.query.all()
+    all_ids = [stop.id for stop in all_stops]
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
     req = requests.get(url)
     text = req.text.split("\n")[1:]
-    for line in text:
+    for line in text[35:]:  # start in line 35 to exlclude stops in Poland
         if len(line) > 1:
             Stop = VBB_Stop(line)
-            if "Berlin" in Stop.name or "Cottbus, " in Stop.name:
+            if Stop.stop_id not in all_ids:
                 feedback = Stop.is_in_osm()
                 if feedback > 0:
                     print_success(Stop.name + ": " + str(feedback))

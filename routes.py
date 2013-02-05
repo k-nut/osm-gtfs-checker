@@ -84,11 +84,11 @@ def recheck(id, from_cm_line=False):
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
     if not from_cm_line:
-        return redirect(url_for("main"))
+        return redirect(url_for("pagination", number=1, city=stop.landkreis))
     else:
         if stop.matches > 0:
             print_success("%s now matches %i stops" % (stop.name,
-                    stop.matches))
+                                                       stop.matches))
         else:
             print_failure("%s does not match any stops..." % (stop.name))
         return True

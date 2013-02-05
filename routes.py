@@ -32,6 +32,7 @@ def pagination(number, city="Berlin"):
         .slice(start, stop)
     landkreise = set([stop.landkreis for stop in DB_Stop.query.all()])
     return render_template("index.html",
+                           city=city,
                            stops=Stops,
                            pages=all_stops,
                            this_page=number,

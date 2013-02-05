@@ -84,7 +84,7 @@ class VBB_Stop():
         #since csvreader doesnt understand unicode we'll just use good ol regex
         pattern = re.compile('(\d*),,"(.*)",,(\d*\.\d*),(\d*\.\d*)')
         fields = re.findall(pattern, line_from_stops_txt)[0]
-        self.stop_id = fields[0]
+        self.stop_id = int(fields[0])
         self.name = fields[1]
         self.lat = float(fields[2])
         self.lon = float(fields[3])

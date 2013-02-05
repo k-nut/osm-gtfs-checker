@@ -3,12 +3,12 @@
 {% block head %}
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
 <!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" />
 <![endif]-->
 
 <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
 <script>
-function initmap() {
+    function initmap() {
         // set up the map
         map = new L.Map('map');
 
@@ -20,50 +20,57 @@ function initmap() {
         // start the map in South-East England
         map.setView(new L.LatLng(52.52, 13.41),13);
         map.addLayer(osm);
-}
-
-function get_markers() {
-	$.getJSON("/api/stops?noMatchesOnly=true", function(data) {
-		$.each(data.stops, function(){
-			new_marker(this);
-		});
-    });
-}
-
-var BusIcon = L.Icon.extend({
-    options: {
-        iconUrl: './static/img/bus-black.png',
-        iconSize: [24, 24]
     }
-});
 
-function new_marker(stop){
-    var this_marker;
-    if(stop.matches >= 1) {
-        this_marker = new L.marker(
+    function get_markers() {
+        var box = map.getBounds();
+        $.getJSON("/api/jsonstops/problemsonly/"
+        + box._northEast.lat + "/" 
+        + box._northEast.lng + "/" 
+        + box._southWest.lat + "/"
+        + box._southWest.lng ,
+        function(data) {
+            $.each(data.stops, function(){
+                new_marker(this);
+            });
+        });
+    }
+
+    var BusIcon = L.Icon.extend({
+        options: {
+            iconUrl: './static/img/bus-black.png',
+            iconSize: [24, 24]
+        }
+    });
+
+    function new_marker(stop){
+        var this_marker;
+        if(stop.matches >= 1) {
+            this_marker = new L.marker(
             [stop.lat, stop.lon],
             { icon: new BusIcon() }
-        );
-    } else {
-        this_marker = new L.marker(
+            );
+            } else {
+            this_marker = new L.marker(
             [stop.lat, stop.lon],
             { icon: new BusIcon({iconUrl: './static/img/bus-red.png'}) }
-        );
+            );
+        }
+        this_marker.bindPopup(stop.name);
+        this_marker.addTo(map);
     }
-	this_marker.bindPopup(stop.name);
-	this_marker.addTo(map);
-}
 
-$(document).ready(function(){
-	initmap();
-	get_markers();
-});
+    $(document).ready(function(){
+        initmap();
+        get_markers();
+        map.on('moveend', function(){get_markers()})
+    });
 </script>
 <style>
-#map{
-	width: 100%;
-	height: 500px;
-}
+    #map{
+        width: 100%;
+        height: 500px;
+    }
 </style>
 {% endblock %}
 {% block content %}

@@ -50,6 +50,7 @@ def search(query):
     return render_template("index.html", stops=Stops, pages=False)
 
 
+
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")
 def stops_in_bounding_box(show_only, north, east, south, west):
     ''' Only show stops within a given bounding box. Allow filtering by
@@ -74,6 +75,35 @@ def stops_in_bounding_box(show_only, north, east, south, west):
         ).all()
 
     return render_template("index.html", stops=result)
+
+
+@app.route("/api/jsonstops/<show_only>/<north>/<east>/<south>/<west>")
+def stops_in_bounding_box(show_only, north, east, south, west):
+    ''' Only show stops within a given bounding box. Allow filtering by
+    matches/nomatches'''
+    if show_only == "problemsonly":
+        result = DB_Stop.query.filter(
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches == 0
+        ).all()
+
+    elif show_only == "matchesonly":
+        result = DB_Stop.query.filter(
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches > 0
+        ).all()
+    else:
+        result = DB_Stop.query.filter(
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+        ).all()
+
+    all_stops = []
+    for stop in result:
+        all_stops.append(stop.to_dict())
+    return jsonify(stops=all_stops)
 
 
 @app.route("/recheck/<id>")

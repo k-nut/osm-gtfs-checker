@@ -102,7 +102,6 @@ def map_of_the_bad():
 
 @app.route("/api/stops")
 def api_stops():
-
     if request.args.get("matchesOnly"):
         Stops = DB_Stop.query.filter(DB_Stop.matches >= 1).all()
     elif request.args.get("noMatchesOnly"):

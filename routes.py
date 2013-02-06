@@ -50,7 +50,6 @@ def search(query):
     return render_template("index.html", stops=Stops, pages=False)
 
 
-
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")
 def stops_in_bounding_box(show_only, north, east, south, west):
     ''' Only show stops within a given bounding box. Allow filtering by
@@ -78,7 +77,7 @@ def stops_in_bounding_box(show_only, north, east, south, west):
 
 
 @app.route("/api/jsonstops/<show_only>/<north>/<east>/<south>/<west>")
-def stops_in_bounding_box(show_only, north, east, south, west):
+def json_stops(show_only, north, east, south, west):
     ''' Only show stops within a given bounding box. Allow filtering by
     matches/nomatches'''
     if show_only == "problemsonly":
@@ -103,6 +102,8 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     all_stops = []
     for stop in result:
         all_stops.append(stop.to_dict())
+    if len(all_stops) > 100:
+        return jsonify(stops="Too many")
     return jsonify(stops=all_stops)
 
 

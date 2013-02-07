@@ -66,26 +66,27 @@
 				var landkreis = $("#landkreis-picker").val();
 				window.location = "/city/" + landkreis + "/page/1"
 				console.log(landkreis);
-            }
+			}
 
-            $(document).ready(function(){
-                initmap();
-                // We need to force leaflet into redrawing the map in order to
-                // show all tiles
-                $("#own_area_modal").on('shown', function()
-                {
-                    L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
-                });
+			function own_area(showOnly){
+				var box = map.getBounds();
+				window.location = "/stops/" + showOnly + "/"
+				+ box._northEast.lat + "/" 
+				+ box._northEast.lng + "/" 
+				+ box._southWest.lat + "/"
+				+ box._southWest.lng 
+			}
+
+			$(document).ready(function(){
+				initmap();
+				// We need to force leaflet into redrawing the map in order to
+				// show all tiles
+				$("#own_area_modal").on('shown', function()
+				{
+					L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
+				});
 				$(".checkbox input").click(function(){
 					hiderows($(this));
-				});
-				$("#own_area_submit").click(function(){
-					var box = map.getBounds();
-					window.location = "/stops/all/"
-					+ box._northEast.lat + "/" 
-					+ box._northEast.lng + "/" 
-					+ box._southWest.lat + "/"
-					+ box._southWest.lng 
 				});
 				count();
 			})
@@ -94,8 +95,8 @@
 	</head>
 	<body>
 		<div class="navbar">
-            <div class="navbar-inner">
-                <a class="brand" href="/">Berliner &amp; Brandenburger OSM-Haltestellen Validator</a>
+			<div class="navbar-inner">
+				<a class="brand" href="/">Berliner &amp; Brandenburger OSM-Haltestellen Validator</a>
                 <ul class="nav">
 					<li class="active"><a href="/">Start</a>
                     <li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
@@ -171,8 +172,9 @@
 			</div>
 
 			<div class="modal-footer">
-				<a href="#" class="btn" data-dismiss="modal">Schließen</a>
-				<a href="#" class="btn btn-primary" id=own_area_submit>Los</a>
+				<a href='javascript:own_area("problemsonly");' class="btn btn-danger">Zeige nur fehlende </a>
+				<a href='javascript:own_area("matchesonly");' class="btn btn-success">Zeige nur vorhandene </a>
+				<a href='javascript:own_area("all");' class="btn btn-primary" id=own_area_submit>Zeige alle Stationen</a>
 			</div>
 		</div>
 

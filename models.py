@@ -97,11 +97,12 @@ class VBB_Stop():
         south = self.lat + 0.002
         west = self.lon + 0.002
         short_name = self.name
-        if " (" in short_name:  # remove the (Berlin) from the line
-            short_name = short_name.split(" (")[0]
 
         if (", ") in short_name:
             short_name = short_name.split(", ")[1]
+
+        if " (" in short_name:  # remove the (Berlin) from the line
+            short_name = short_name.split(" (")[0]
 
         # if we have something like StreetA/StreetB overpass is not able to find this
         # we can just look for StreetB or StreetA though since we are limiting the search on a small ara

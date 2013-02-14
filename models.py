@@ -117,6 +117,9 @@ class VBB_Stop():
             parts = short_name.split("Str.")
             short_name = short_name + "|" + parts[0] + u"Straße"
 
+        if "str." in short_name:
+            short_name = short_name + "|" + short_name.replace(u"str.", u"straße")
+
         if "S+U" in short_name:
             # Stops Like "S+U Wedding" are in OSM as "S Wedding" and "U Wedding"
             # So we split it up and check for both

@@ -127,9 +127,10 @@ def recheck(id, from_cm_line=False):
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
     if not from_cm_line:
-        logging.info("[recheck] Name: %s; Old: %i; New: %i" % (stop.name,
-                                                               old_matches,
-                                                               stop.matches))
+        logging.info("[recheck] Name: %s; Old: %i; New: %i; IP: %s" % (stop.name,
+                                                                       old_matches,
+                                                                       stop.matches,
+                                                                       request.remote_addr))
         return redirect(url_for("pagination", number=1, city=stop.landkreis))
     else:
         if stop.matches > 0:

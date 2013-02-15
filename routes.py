@@ -5,9 +5,19 @@ from flask import redirect, url_for, \
     render_template, jsonify, request
 import datetime
 import logging
+import sys
 
 from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
 from helpers import print_success, print_failure
+
+
+logging.basicConfig(filename="rechecks.log",
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    level=logging.INFO)
+if "--verbose" in sys.argv:
+    console = logging.StreamHandler(sys.stdout)
+    logging.getLogger('').addHandler(console)
 
 
 @app.route("/")
@@ -28,20 +38,20 @@ def pagination(number, city="Berlin"):
     ).count()
     all_stops = DB_Stop.query.filter(DB_Stop.landkreis == city).count()
     Stops = DB_Stop.query \
-        .filter(DB_Stop.landkreis == city) \
-        .order_by("last_run desc") \
-        .slice(start, stop)
+            .filter(DB_Stop.landkreis == city) \
+            .order_by("last_run desc") \
+            .slice(start, stop)
     landkreise = list(set([stop.landkreis for stop in
-                           DB_Stop.query.all()]))
+        DB_Stop.query.all()]))
     landkreise.sort()
     return render_template("index.html",
-                           city=city,
-                           stops=Stops,
-                           pages=all_stops,
-                           this_page=number,
-                           matches_count=matches,
-                           landkreise=landkreise
-                           )
+            city=city,
+            stops=Stops,
+            pages=all_stops,
+            this_page=number,
+            matches_count=matches,
+            landkreise=landkreise
+            )
 
 
 @app.route("/search/<query>")
@@ -57,24 +67,24 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     matches/nomatches'''
     if show_only == "problemsonly":
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches == 0
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                DB_Stop.matches == 0
+                ).all()
 
     elif show_only == "matchesonly":
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches > 0
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                DB_Stop.matches > 0
+                ).all()
     else:
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                ).all()
 
-    return render_template("index.html", stops=result)
+        return render_template("index.html", stops=result)
 
 
 @app.route("/api/jsonstops/<show_only>/<north>/<east>/<south>/<west>")
@@ -83,24 +93,24 @@ def json_stops(show_only, north, east, south, west):
     matches/nomatches'''
     if show_only == "problemsonly":
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches == 0
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                DB_Stop.matches == 0
+                ).all()
 
     elif show_only == "matchesonly":
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches > 0
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                DB_Stop.matches > 0
+                ).all()
     else:
         result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-        ).all()
+                DB_Stop.lat.between(float(south), float(north)),
+                DB_Stop.lon.between(float(west), float(east)),
+                ).all()
 
-    all_stops = []
+        all_stops = []
     for stop in result:
         all_stops.append(stop.to_dict())
     if len(all_stops) > 100:
@@ -112,12 +122,14 @@ def json_stops(show_only, north, east, south, west):
 def recheck(id, from_cm_line=False):
     ''' Rerun the checks for a stop and update the db'''
     stop = DB_Stop.query.filter_by(id=id).first()
+    old_matches = stop.matches
     stop.matches = VBB_Stop(stop.to_vbb_syntax()).is_in_osm()
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
     if not from_cm_line:
-        logging.basicConfig(filename="rechecks.log", level=logging.INFO)
-        logging.info("%s: %s" % (stop.name, stop.matches))
+        logging.info("[recheck] Name: %s; Old: %i; New: %i" % (stop.name,
+                                                               old_matches,
+                                                               stop.matches))
         return redirect(url_for("pagination", number=1, city=stop.landkreis))
     else:
         if stop.matches > 0:

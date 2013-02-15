@@ -7,6 +7,7 @@ from flask import Flask, json
 from flask_sqlalchemy import SQLAlchemy
 
 import config
+import logging
 
 import os
 import re
@@ -127,8 +128,7 @@ class VBB_Stop():
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
-        print short_name # This will break due to unicode conversions further
-        # investigation is needed ;)
+        logging.info("[in_osm] Name: %s; Checking: %s" % (self.name, short_name))
         payload = {"data": '[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)

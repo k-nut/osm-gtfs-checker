@@ -125,7 +125,7 @@ def recheck(id, from_cm_line=False):
                                                        stop.matches))
         else:
             print_failure("%s does not match any stops..." % (stop.name))
-        return True
+        return stop.matches
 
 
 @app.route("/map_of_the_bad")
@@ -169,8 +169,12 @@ def get_trains():
 
 def recheck_all_missings_stops():
     Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+    total = 0
     for Stop in Stops:
-        recheck(Stop.id, from_cm_line=True)
+        out = recheck(Stop.id, from_cm_line=True)
+        if out > 0:
+            total += 1
+    print_success("Insgesamt %i neue Treffer" % total)
 
 
 def recheck_all():

@@ -4,6 +4,7 @@ import requests
 from flask import redirect, url_for, \
     render_template, jsonify, request
 import datetime
+import logging
 
 from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
 from helpers import print_success, print_failure
@@ -115,6 +116,8 @@ def recheck(id, from_cm_line=False):
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
     if not from_cm_line:
+        logging.basicConfig(filename="rechecks.log", level=logging.INFO)
+        logging.info("%s: %s" % (stop.name, stop.matches))
         return redirect(url_for("pagination", number=1, city=stop.landkreis))
     else:
         if stop.matches > 0:

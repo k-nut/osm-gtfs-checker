@@ -21,6 +21,10 @@ To install the dependencies and create the initial database use:
     pip install -r requirements.txt
     ./deploy.py
 
+Arguments
+---------
+If you are in development mode you might want to pass ``` --verbose ``` to routes.py
+
 License
 -------
 Published under the MIT License. Refer to the LICENSE.txt for a copy of the license.

@@ -162,6 +162,11 @@ def api_stops():
     return jsonify(stops=all_stops)
 
 
+@app.route('/robots.txt')
+def sitemap():
+    return render_template("robots.txt")
+
+
 def get_trains():
     ''' The initial query to set up the train db '''
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/routes.txt"

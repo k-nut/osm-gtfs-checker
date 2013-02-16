@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask import redirect, url_for, \
-    render_template, jsonify, request
+    render_template, jsonify, request, \
+    send_from_directory
 import datetime
 import logging
 import sys
@@ -163,8 +164,8 @@ def api_stops():
 
 
 @app.route('/robots.txt')
-def sitemap():
-    return render_template("robots.txt")
+def serve_static():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 
 def get_trains():

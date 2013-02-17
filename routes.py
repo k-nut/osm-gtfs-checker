@@ -111,7 +111,7 @@ def json_stops(show_only, north, east, south, west):
                 DB_Stop.lon.between(float(west), float(east)),
                 ).all()
 
-        all_stops = []
+    all_stops = []
     for stop in result:
         all_stops.append(stop.to_dict())
     if len(all_stops) > 100:

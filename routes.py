@@ -39,20 +39,20 @@ def pagination(number, city="Berlin"):
     ).count()
     all_stops = DB_Stop.query.filter(DB_Stop.landkreis == city).count()
     Stops = DB_Stop.query \
-            .filter(DB_Stop.landkreis == city) \
-            .order_by("last_run desc") \
-            .slice(start, stop)
+        .filter(DB_Stop.landkreis == city) \
+        .order_by("last_run desc") \
+        .slice(start, stop)
     landkreise = list(set([stop.landkreis for stop in
-        DB_Stop.query.all()]))
+                           DB_Stop.query.all()]))
     landkreise.sort()
     return render_template("index.html",
-            city=city,
-            stops=Stops,
-            pages=all_stops,
-            this_page=number,
-            matches_count=matches,
-            landkreise=landkreise
-            )
+                           city=city,
+                           stops=Stops,
+                           pages=all_stops,
+                           this_page=number,
+                           matches_count=matches,
+                           landkreise=landkreise
+                           )
 
 
 @app.route("/search/<query>")
@@ -68,24 +68,30 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     matches/nomatches'''
     if show_only == "problemsonly":
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                DB_Stop.matches == 0
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches == 0
+        ).all()
 
     elif show_only == "matchesonly":
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                DB_Stop.matches > 0
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches > 0
+        ).all()
     else:
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+        ).all()
 
-        return render_template("index.html", stops=result)
+    landkreise = list(set([stop.landkreis for stop in
+                           DB_Stop.query.all()]))
+    landkreise.sort()
+    return render_template("index.html",
+                           stops=result,
+                           landkreise=landkreise
+                           )
 
 
 @app.route("/api/jsonstops/<show_only>/<north>/<east>/<south>/<west>")
@@ -94,28 +100,29 @@ def json_stops(show_only, north, east, south, west):
     matches/nomatches'''
     if show_only == "problemsonly":
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                DB_Stop.matches == 0
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches == 0
+        ).all()
 
     elif show_only == "matchesonly":
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                DB_Stop.matches > 0
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+            DB_Stop.matches > 0
+        ).all()
     else:
         result = DB_Stop.query.filter(
-                DB_Stop.lat.between(float(south), float(north)),
-                DB_Stop.lon.between(float(west), float(east)),
-                ).all()
+            DB_Stop.lat.between(float(south), float(north)),
+            DB_Stop.lon.between(float(west), float(east)),
+        ).all()
 
     all_stops = []
     for stop in result:
         all_stops.append(stop.to_dict())
-    if len(all_stops) > 100:
-        return jsonify(stops="Too many")
+        if len(all_stops) > 100:
+            return jsonify(stops="Too many")
+
     return jsonify(stops=all_stops)
 
 

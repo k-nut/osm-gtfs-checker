@@ -33,15 +33,12 @@ def pagination(number, city="Berlin"):
     number = int(number)
     start = (number-1)*50
     stop = number * 50
-    matches = DB_Stop.query.filter(
-        DB_Stop.landkreis == city,
-        DB_Stop.matches > 0
-    ).count()
-    all_stops = DB_Stop.query.filter(DB_Stop.landkreis == city).count()
-    Stops = DB_Stop.query \
-        .filter(DB_Stop.landkreis == city) \
-        .order_by("last_run desc") \
-        .slice(start, stop)
+    q = DB_Stop.query\
+        .filter(DB_Stop.landkreis == city)\
+        .order_by("last_run desc").all()
+    Stops = q[start:stop]
+    all_stops = len(q)
+    matches = len([stop for stop in q if stop.matches > 0])
     landkreise = list(set([stop.landkreis for stop in
                            DB_Stop.query.all()]))
     landkreise.sort()

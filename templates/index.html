@@ -40,6 +40,7 @@
 		</style>
 		<script>
 			$(document).ready(function(){
+				$(".nav li").eq(0).attr("class", "active");
 				initmap();
 				// We need to force leaflet into redrawing the map in order to
 				// show all tiles
@@ -60,7 +61,7 @@
 			<div class="navbar-inner">
 				<a class="brand" href="/">Berliner &amp; Brandenburger OSM-Haltestellen Validator</a>
 				<ul class="nav">
-					<li class="active"><a href="/">Start</a>
+					<li><a href="/">Start</a>
 					<li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
 					<li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
 				</ul>

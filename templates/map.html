@@ -8,68 +8,7 @@
 
 <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
 <script>
-    function initmap() {
-        // set up the map
-        map = new L.Map('map');
-
-        // create the tile layer with correct attribution
-        var osmUrl='http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
-        var osmAttrib='Map data Â© OpenStreetMap contributors';
-        var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 18, attribution: osmAttrib});
-
-        // start the map in South-East England
-        map.setView(new L.LatLng(52.52, 13.41),13);
-        map.addLayer(osm);
-    }
-
-    function get_markers() {
-        var box = map.getBounds();
-        $.getJSON("/api/jsonstops/problemsonly/"
-        + box._northEast.lat + "/" 
-        + box._northEast.lng + "/" 
-        + box._southWest.lat + "/"
-        + box._southWest.lng ,
-        function(data) {
-            if (data.stops == "Too many"){
-                $("#toomuch").fadeIn(750,function(){$("#toomuch").fadeOut(2000);}); 
-            }
-            else{
-                $.each(data.stops, function(){
-                    new_marker(this);
-                });
-            }
-        });
-    }
-
-    var BusIcon = L.Icon.extend({
-        options: {
-            iconUrl: './static/img/bus-black.png',
-            iconSize: [24, 24]
-        }
-    });
-
-    function new_marker(stop){
-        var this_marker;
-        if(stop.matches >= 1) {
-            this_marker = new L.marker(
-            [stop.lat, stop.lon],
-            { icon: new BusIcon() }
-            );
-            } else {
-            this_marker = new L.marker(
-            [stop.lat, stop.lon],
-            { icon: new BusIcon({iconUrl: './static/img/bus-red.png'}) }
-            );
-        }
-        this_marker.bindPopup(stop.name);
-        this_marker.addTo(map);
-    }
-
-    $(document).ready(function(){
-        initmap();
-        get_markers();
-        map.on('moveend', function(){get_markers()})
-    });
+	{% include "map.js" %}
 </script>
 <style>
 	#map{
@@ -87,7 +26,7 @@
     border-top-right-radius: 10px; border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px; padding: 15px; box-shadow: black 5px 5px
     10px; width: 150px; display: none; z-index:1000;">
-    <p> Zu viele Punkte in der aktuellen Ansicht. Bitte weiter rein zoomen. </p>
+    <p> Zu viele Haltestellen in der aktuellen Ansicht. Bitte weiter rein zoomen. </p>
 </div>
 <div id="map"> Karte </div>
 {% endblock %}

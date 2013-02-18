@@ -38,9 +38,59 @@
 				padding-right: 50px;
 			}
 		</style>
-		<script>
-			$(document).ready(function(){
-				$(".nav li").eq(0).attr("class", "active");
+        <script>
+            function get_parameters(){
+                if (window.location.toString().indexOf("?") < 0){
+                    return false
+                }
+                var parampart = window.location.toString().split("?")[1];
+                var params = parampart.split("&");
+                var values = {};
+                $.each(params, function(index, value){
+                    var parts = value.split("=");
+                    values[parts[0]] = parts[1];
+                })
+                return values
+            }
+
+            function change_links(){
+                var parampart = "?";
+                if ($("#nomatch").attr("checked") == "checked"){
+                        parampart += "nomatch=true&";
+                }
+                if ($("#match").attr("checked") == "checked"){
+                        parampart += "match=true";
+                }
+                $(".pagination a").each(function(){
+                    var old_url = $(this).attr("href");
+                    if (old_url.indexOf("?") > -1){
+                        var new_url = old_url.split("?")[0];
+                    }
+                    else{
+                        var new_url = old_url;
+                    }
+                    new_url += parampart;
+                    $(this).attr("href", new_url);
+                });
+            }
+
+            $(document).ready(function(){
+                // set active class for active page in navbar
+                $(".nav li").eq(0).attr("class", "active");
+                
+                // recover previous filters
+                params = get_parameters();
+                if (params["nomatch"] == "true")
+                {
+                    $("#match").attr("checked", false);
+                    hiderows($("#match"));
+                }
+                if (params["match"] == "true")
+                {
+                    $("#nomatch").attr("checked", false);
+                    hiderows($("#nomatch"));
+                }
+
 				initmap();
 				// We need to force leaflet into redrawing the map in order to
 				// show all tiles
@@ -49,9 +99,11 @@
 					L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
 				});
 				$(".checkbox input").click(function(){
-					hiderows($(this));
+                    hiderows($(this));
+                    change_links()
 				});
-				count();
+                count();
+                change_links();
 			})
 		</script>
 		{% endblock %}
@@ -111,10 +163,10 @@
 				<div class=span12>
 					<h2> Anzeigekriterien</h2>
 					<label class="checkbox pull-left">
-						<input type="checkbox" name="match" checked>Zeige Stationen, die in OSM sind
+						<input type="checkbox" id="match" name="match" checked>Zeige Stationen, die in OSM sind
 					</label>
 					<label class="checkbox pull-left">
-						<input type="checkbox" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
+						<input type="checkbox" id="nomatch" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
 					</label>
 				</div>
 			</div>

@@ -190,8 +190,7 @@ def get_trains():
             db.session.commit()
 
 
-def recheck_all_missings_stops():
-    Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+def recheck_batch(Stops):
     total = 0
     for Stop in Stops:
         out = recheck(Stop.id, from_cm_line=True)
@@ -200,10 +199,20 @@ def recheck_all_missings_stops():
     print_success("Insgesamt %i neue Treffer" % total)
 
 
+def recheck_all_missings_stops():
+    Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+    recheck_batch(Stops)
+
+
+def recheck_by_name(name):
+    Stops = DB_Stop.query.filter(DB_Stop.name.like("%" + name + "%"),
+                                 DB_Stop.matches < 1).all()
+    recheck_batch(Stops)
+
+
 def recheck_all():
     Stops = DB_Stop.query.all()
-    for Stop in Stops:
-        recheck(Stop.id, from_cm_line=True)
+    recheck_batch(Stops)
 
 
 def get_stops():

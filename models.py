@@ -103,7 +103,7 @@ class VBB_Stop():
         # <name of the village>, Bahnhof.
         # in osm those are just the village name without the "Bahnhof"
         # so we filter for that special case
-        if ", Bahnhof" in short_name:
+        if short_name.endswith(", Bahnhof"):
             short_name = short_name.split(", Bahnhof")[0]
 
         if (", ") in short_name:

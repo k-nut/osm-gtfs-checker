@@ -99,6 +99,13 @@ class VBB_Stop():
         west = self.lon + 0.002
         short_name = self.name
 
+        # in the smaller cities there are some stops that are just
+        # <name of the village>, Bahnhof.
+        # in osm those are just the village name without the "Bahnhof"
+        # so we filter for that special case
+        if ", Bahnhof" in short_name:
+            short_name = short_name.split(", Bahnhof")[0]
+
         if (", ") in short_name:
             short_name = short_name.split(", ")[1]
 

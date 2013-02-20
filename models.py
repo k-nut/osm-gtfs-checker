@@ -7,6 +7,7 @@ from flask import Flask, json
 from flask_sqlalchemy import SQLAlchemy
 
 import config
+from match_exceptions import match_exceptions
 import logging
 
 import os
@@ -103,6 +104,9 @@ class VBB_Stop():
         # <name of the village>, Bahnhof.
         # in osm those are just the village name without the "Bahnhof"
         # so we filter for that special case
+        if self.stop_id in match_exceptions:
+            short_name = match_exceptions[self.stop_id]
+
         if short_name.endswith(", Bahnhof"):
             short_name = short_name.split(", Bahnhof")[0]
 

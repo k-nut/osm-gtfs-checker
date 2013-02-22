@@ -7,6 +7,7 @@ from flask import redirect, url_for, \
 import datetime
 import logging
 import sys
+from math import log10
 
 from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
 from helpers import print_success, print_failure
@@ -192,7 +193,13 @@ def get_trains():
 
 def recheck_batch(Stops):
     total = 0
+    number_of_stops = len(Stops)
+    # get the number of digits we want to show
+    digits = int(log10(number_of_stops)) + 1
+    counter = 0
     for Stop in Stops:
+        counter += 1
+        print "%*i/%*i " % (digits, counter, digits, number_of_stops),
         out = recheck(Stop.id, from_cm_line=True)
         if out > 0:
             total += 1

@@ -28,3 +28,8 @@ def print_success(message):
 def print_failure(message):
     ''' Print the message in red '''
     print '\033[1;31m%s\033[1;m' % (message)
+
+
+def print_info(message):
+    ''' Print the message in yellow '''
+    print '\033[1;33m%s\033[1;m' % (message)

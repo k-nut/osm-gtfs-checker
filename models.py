@@ -139,7 +139,7 @@ class VBB_Stop():
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
-        logging.info("[in_osm] Name: %s; Checking: %s" % (self.name, short_name))
+        logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
         payload = {"data": '[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)

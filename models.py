@@ -94,10 +94,6 @@ class VBB_Stop():
     def is_in_osm(self):
         ''' Call Overpass to see if there is an object with the given name
             close to the cordinates given '''
-        north = self.lat - 0.002
-        east = self.lon - 0.002
-        south = self.lat + 0.002
-        west = self.lon + 0.002
         short_name = self.name
 
         # in the smaller cities there are some stops that are just
@@ -141,7 +137,7 @@ class VBB_Stop():
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
         logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
-        payload = {"data": '[output:json];node(%f, %f, %f, %f)["name"~"%s"];out skel;' % (north, east, south, west, short_name)}
+        payload = {"data": '[output:json];node(around: 150, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)
         stations = this_json.get("elements")

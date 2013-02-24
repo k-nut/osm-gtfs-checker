@@ -28,10 +28,11 @@
 			label{
 				cursor:pointer;
 			}
-			#map_picker{
+			.modal_map{
 				width: 530px;
 				height: 300px;
 			}
+
 			.container{
 				width: 100%;
 				padding-left: 50px;
@@ -72,9 +73,19 @@
                     new_url += parampart;
                     $(this).attr("href", new_url);
                 });
-            }
+	}
 
-            $(document).ready(function(){
+	function change_link_for_remote_edit(){
+		var lat = radius_map.getCenter().lat;
+		var lon = radius_map.getCenter().lng;
+		var zoom = radius_map.getZoom();
+		var url = "http://www.openstreetmap.org/edit?editor=remote&lat=" + lat + "&lon=" + lon + "&zoom=" + zoom;
+		$("#remote_edit_link").attr("href", url);
+	}
+
+
+	$(document).ready(function(){
+		map_exists = false;
                 // set active class for active page in navbar
                 $(".nav li").eq(0).attr("class", "active");
                 
@@ -221,9 +232,9 @@
 						<th> {{ stop.lat }}</th>
 						<th> {{ stop.lon }}</th>
 						<th> {{ stop.last_run }}</th>
-						<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&amp;mlon={{ stop.lon }}&amp;zoom=17&amp;layers=T" target="blank">Position laut VBB</a></th>
-                        <th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
-                        <th> <a href="{{ stop.turbo_url }}" target="_blank"> Karte </a> </th>
+						<th> <a href="#" onclick="radiusmap({{ stop.lat }}, {{ stop.lon }});">Position laut VBB</a></th>
+						<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+						<th> <a href="{{ stop.turbo_url }}" target="_blank"> Karte </a> </th>
 					</tr>
 					{% endfor %}
 				</table>
@@ -236,13 +247,22 @@
 				<h3>Eigenen Bereich festlegen</h3>
 			</div>
 			<div class="modal-body">
-				<div id="map_picker"></div>
+				<div class="modal_map" id="map_picker"></div>
 			</div>
 
 			<div class="modal-footer">
 				<a href='javascript:own_area("problemsonly");' class="btn btn-danger">Zeige nur fehlende </a>
 				<a href='javascript:own_area("matchesonly");' class="btn btn-success">Zeige nur vorhandene </a>
 				<a href='javascript:own_area("all");' class="btn btn-primary" id=own_area_submit>Zeige alle Stationen</a>
+			</div>
+		</div>
+
+		<div id="search_radius" class="modal hide fade">
+			<div class="modal-body">
+				<div id="radius_map" class="modal_map"></div>
+			</div>
+			<div class=modal-footer>
+				<a id="remote_edit_link" class="btn btn-primary" target="_blank">Mit JOSM/Merkaator bearbeiten </a>
 			</div>
 		</div>
 		{% endblock %}

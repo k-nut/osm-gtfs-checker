@@ -43,6 +43,10 @@ def pagination(number, city="Berlin"):
     landkreise = list(set([stop.landkreis for stop in
                            DB_Stop.query.all()]))
     landkreise.sort()
+
+    for stop in Stops:
+        stop.turbo_url = VBB_Stop(stop.to_vbb_syntax()).turbo_url()
+
     return render_template("index.html",
                            city=city,
                            stops=Stops,

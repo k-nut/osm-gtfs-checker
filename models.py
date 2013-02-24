@@ -62,7 +62,7 @@ class DB_Stop(db.Model):
         elif 4 in kreise:
             self.landkreis = kreise[4]
         else:
-            self.landkresi = "Unknown"
+            self.landkreis = "Unknown"
 
     def to_vbb_syntax(self):
         ''' Return a line that looks as if it comes from the routes.txt '''
@@ -91,9 +91,7 @@ class VBB_Stop():
         self.lat = float(fields[2])
         self.lon = float(fields[3])
 
-    def is_in_osm(self):
-        ''' Call Overpass to see if there is an object with the given name
-            close to the cordinates given '''
+    def get_short_name(self):
         short_name = self.name
 
         # in the smaller cities there are some stops that are just
@@ -136,8 +134,23 @@ class VBB_Stop():
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
+        return short_name
+
+    def create_payload(self):
+        short_name = self.get_short_name()
+        payload = {"data": '[output:json];node(around: 250, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
+        return payload
+
+    def turbo_url(self):
+        return "http://overpass-turbo.eu/map.html?Q=" + \
+               self.create_payload()["data"].replace("out skel;", "out;")
+
+    def is_in_osm(self):
+        ''' Call Overpass to see if there is an object with the given name
+        close to the cordinates given '''
+        short_name = self.get_short_name()
         logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
-        payload = {"data": '[output:json];node(around: 150, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
+        payload = self.create_payload()
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         this_json = json.loads(r.text)
         stations = this_json.get("elements")
@@ -158,17 +171,17 @@ class Bvg_line():
             self.operator = "DB"
         else:
             self.operator = "other"
-        #transit_type (Bus/tram/etc.)
-        if self.agency.endswith("T"):
-            self.transit_type = "Tram"
-        elif self.agency.endswith("S"):
-            self.transit_type = "S-Bahn"
-        elif self.agency.endswith("B"):
-            self.transit_type = "Bus"
-        elif self.agency.endswith("F"):
-            self.transit_type = "Faehre"
-        else:
-            self.transit_type = self.agency
+            #transit_type (Bus/tram/etc.)
+            if self.agency.endswith("T"):
+                self.transit_type = "Tram"
+            elif self.agency.endswith("S"):
+                self.transit_type = "S-Bahn"
+            elif self.agency.endswith("B"):
+                self.transit_type = "Bus"
+            elif self.agency.endswith("F"):
+                self.transit_type = "Faehre"
+            else:
+                self.transit_type = self.agency
 
     def is_in_osm(self):
         payload = {"data":'[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}

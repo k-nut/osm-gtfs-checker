@@ -206,7 +206,8 @@
 					<th> Lon (VBB) </th>
 					<th> Zuletz geprueft </th>
 					<th> Auf OSM Karte </th>
-					<th> Nochmal prüfen </th>
+                    <th> Nochmal prüfen </th>
+                    <th> Karte der Funde </th>
 				</tr>
 				{% for stop in stops %}
 				{% if stop.matches > 0 %}
@@ -221,7 +222,8 @@
 						<th> {{ stop.lon }}</th>
 						<th> {{ stop.last_run }}</th>
 						<th> <a href="http://www.openstreetmap.org/?mlat={{ stop.lat }}&amp;mlon={{ stop.lon }}&amp;zoom=17&amp;layers=T" target="blank">Position laut VBB</a></th>
-						<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+                        <th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+                        <th> <a href="{{ stop.turbo_url }}" target="_blank"> Karte </a> </th>
 					</tr>
 					{% endfor %}
 				</table>

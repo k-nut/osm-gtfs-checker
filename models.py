@@ -90,6 +90,8 @@ class VBB_Stop():
         self.name = fields[1]
         self.lat = float(fields[2])
         self.lon = float(fields[3])
+        self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
+                            self.create_payload()["data"].replace("out skel;", "out;")
 
     def get_short_name(self):
         short_name = self.name
@@ -140,10 +142,6 @@ class VBB_Stop():
         short_name = self.get_short_name()
         payload = {"data": '[output:json];node(around: 250, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
         return payload
-
-    def turbo_url(self):
-        return "http://overpass-turbo.eu/map.html?Q=" + \
-               self.create_payload()["data"].replace("out skel;", "out;")
 
     def is_in_osm(self):
         ''' Call Overpass to see if there is an object with the given name

@@ -73,3 +73,46 @@ function own_area(showOnly){
 		box._southWest.lat + "/" +
 		box._southWest.lng; 
 }
+
+			function get_parameters(){
+				if (window.location.toString().indexOf("?") < 0){
+					return false
+				}
+				var parampart = window.location.toString().split("?")[1];
+				var params = parampart.split("&");
+				var values = {};
+				$.each(params, function(index, value){
+					var parts = value.split("=");
+					values[parts[0]] = parts[1];
+				})
+				return values
+			}
+
+			function change_links(){
+				var parampart = "?";
+				if ($("#nomatch").attr("checked") == "checked"){
+					parampart += "nomatch=true&";
+				}
+				if ($("#match").attr("checked") == "checked"){
+					parampart += "match=true";
+				}
+				$(".pagination a").each(function(){
+					var old_url = $(this).attr("href");
+					if (old_url.indexOf("?") > -1){
+						var new_url = old_url.split("?")[0];
+					}
+					else{
+						var new_url = old_url;
+					}
+					new_url += parampart;
+					$(this).attr("href", new_url);
+				});
+			}
+
+			function change_link_for_remote_edit(){
+				var lat = radius_map.getCenter().lat;
+				var lon = radius_map.getCenter().lng;
+				var zoom = radius_map.getZoom();
+				var url = "http://www.openstreetmap.org/edit?editor=remote&lat=" + lat + "&lon=" + lon + "&zoom=" + zoom;
+				$("#remote_edit_link").attr("href", url);
+			}

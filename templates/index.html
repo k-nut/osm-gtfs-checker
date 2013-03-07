@@ -2,9 +2,12 @@
 <html lang=de>
 	<head>
 		<title> OSM-VBB-Checker |{% block title %} Haltestellen in {{ city }} {% endblock %} </title>
+		<meta name="viewport" content="width=device-width">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-		<link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-		<script src="/static/js/bootstrap.js"></script>
+		<!--	<link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<script src="/static/js/bootstrap.js"></script>-->
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
 		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
 		<!--[if lte IE 8]>
 		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
@@ -39,68 +42,24 @@
 				padding-right: 50px;
 			}
 		</style>
-        <script>
-            function get_parameters(){
-                if (window.location.toString().indexOf("?") < 0){
-                    return false
-                }
-                var parampart = window.location.toString().split("?")[1];
-                var params = parampart.split("&");
-                var values = {};
-                $.each(params, function(index, value){
-                    var parts = value.split("=");
-                    values[parts[0]] = parts[1];
-                })
-                return values
-            }
+		<script>
+			$(document).ready(function(){
+				map_exists = false;
+				// set active class for active page in navbar
+				$(".nav li").eq(0).attr("class", "active");
 
-            function change_links(){
-                var parampart = "?";
-                if ($("#nomatch").attr("checked") == "checked"){
-                        parampart += "nomatch=true&";
-                }
-                if ($("#match").attr("checked") == "checked"){
-                        parampart += "match=true";
-                }
-                $(".pagination a").each(function(){
-                    var old_url = $(this).attr("href");
-                    if (old_url.indexOf("?") > -1){
-                        var new_url = old_url.split("?")[0];
-                    }
-                    else{
-                        var new_url = old_url;
-                    }
-                    new_url += parampart;
-                    $(this).attr("href", new_url);
-                });
-	}
-
-	function change_link_for_remote_edit(){
-		var lat = radius_map.getCenter().lat;
-		var lon = radius_map.getCenter().lng;
-		var zoom = radius_map.getZoom();
-		var url = "http://www.openstreetmap.org/edit?editor=remote&lat=" + lat + "&lon=" + lon + "&zoom=" + zoom;
-		$("#remote_edit_link").attr("href", url);
-	}
-
-
-	$(document).ready(function(){
-		map_exists = false;
-                // set active class for active page in navbar
-                $(".nav li").eq(0).attr("class", "active");
-                
-                // recover previous filters
-                params = get_parameters();
-                if (params["nomatch"] == "true")
-                {
-                    $("#match").attr("checked", false);
-                    hiderows($("#match"));
-                }
-                if (params["match"] == "true")
-                {
-                    $("#nomatch").attr("checked", false);
-                    hiderows($("#nomatch"));
-                }
+				// recover previous filters
+				params = get_parameters();
+				if (params["nomatch"] == "true")
+				{
+					$("#match").attr("checked", false);
+					hiderows($("#match"));
+				}
+				if (params["match"] == "true")
+				{
+					$("#nomatch").attr("checked", false);
+					hiderows($("#nomatch"));
+				}
 
 				initmap();
 				// We need to force leaflet into redrawing the map in order to
@@ -110,11 +69,11 @@
 					L.Util.requestAnimFrame(map.invalidateSize,map,!1,map._container);
 				});
 				$(".checkbox input").click(function(){
-                    hiderows($(this));
-                    change_links()
+					hiderows($(this));
+					change_links()
 				});
-                count();
-                change_links();
+				count();
+				change_links();
 			})
 		</script>
 		{% endblock %}
@@ -122,162 +81,175 @@
 	<body>
 		<div class="navbar">
 			<div class="navbar-inner">
-				<a class="brand" href="/">Berliner &amp; Brandenburger OSM-Haltestellen Validator</a>
-				<ul class="nav">
-					<li><a href="/">Start</a>
-					<li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
-					<li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
-				</ul>
-				<form class="navbar-search pull-right" action="javascript:search()">
-					<input class="search-query" id="search" type="search" placeholder="Haltestellen suchen..." />
-				</form>
-			</div>
-		</div>
-		{% block content %}
+				<div class="container">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class=icon-bar></span>
+						<span class=icon-bar></span>
+						<span class=icon-bar></span>
+					</a>
 
-		<div class="container">
-			<div class=row-fluid>
-				<div class=span12>
-					<p> Prüft auf Basis der Haltestellendaten von
-					<a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">
-						http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt
-					</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein,
-					kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt,
-					oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!
-					</p>
-					<p> 
-					Wenn ihr Fehler im Programm oder Falscheinstufungen findet
-					dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.
-					</p>
-					<p> Viel Spaß :) </p>
+					<a class="brand" href="/">
+						<span class="hidden-phone">Berliner &amp; Brandenburger</span>
+						OSM-Haltestellen Validator
+					</a>
+					<div class="nav-collapse collapse">
+						<ul class="nav">
+							<li><a href="/">Start</a>
+							<li><a href="#" data-target="#own_area_modal" id="own_area" data-toggle="modal">Eigener Bereich</a>
+							<li><a href="/map_of_the_bad">Karte der Fehlenden Stationen</a>
+						</ul>
+						<form class="navbar-search pull-right" action="javascript:search()">
+							<input class="search-query" id="search" type="search" placeholder="Haltestellen suchen..." />
+						</form>
+					</div>
+				</div>
 				</div>
 			</div>
-			<div class=row-fluid>
-				<div class=span6>
-					{% if pages %}
-					<h2>Statistik</h2>
-					Insgesamt: {{ pages  }}
-					In OSM: {{ matches_count }}
-					Nicht in OSM: {{ pages - matches_count }}
-					{% endif %}
-				</div>
-				<div class=span6>
-					<h2> Landkreis wechseln </h2>
-					<select id="landkreis-picker" name="landkreis" onchange="change_landkreis();">
-						{% for landkreis in landkreise %}
-						<option {% if landkreis==city %} selected {% endif %} value="{{ landkreis }}">{{ landkreis }}</option>
-						{% endfor %}
-					</select>
-				</div>
-			</div>
-			<div class=row-fluid>
-				<div class=span12>
-					<h2> Anzeigekriterien</h2>
-					<label class="checkbox pull-left">
-						<input type="checkbox" id="match" name="match" checked>Zeige Stationen, die in OSM sind
-					</label>
-					<label class="checkbox pull-left">
-						<input type="checkbox" id="nomatch" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
-					</label>
-				</div>
-			</div>
-			{% if pages %}
-			<div class="pagination pagination-centered">
-				<ul>
-					<li><a href="/city/{{ city }}/page/{{ this_page-1 }}">Zurück</a></li>
-					{% if this_page-5 > 0 -%}
-					<li><a href="/city/{{city}}/page/1">1</a></li>
-					<li class="disabled"><a href="#">...</a></li>
-					{%- endif %}
-					{% for page_number in range(1, (pages/50)|int) -%}
-					{% if page_number == this_page -%}
-					<li class="active"><a href="/city/{{ city }}/{{ page_number }}">{{ page_number }}</a></li>
-					{% else -%}
-					{% if this_page - page_number < 5 and this_page - page_number > -5 %} 
-					<li><a href="/city/{{city}}/page/{{ page_number }}">{{ page_number }}</a></li>
-					{% endif %}
-					{%- endif %}
-					{%- endfor %}
-					{% if this_page+5 < pages -%}
-					<li class="disabled"><a href="#">...</a></li>
-					<li><a href="/city/{{city}}/page/{{ (pages/50)|int }}">{{ (pages/50)|int }}</a></li>
-					{%- endif %}
-					<li><a href="/city/{{city}}/page/{{ this_page+1 }}">Vor</a></li>
-				</ul>
-			</div>
-			{% endif %}
-			<p style="text-align: center"> Insgesamt <span id="total"> 0 </span> Haltestellen. Davon <span id="nomatch_total"> 0 </span> nicht gefunden.
+			{% block content %}
 
-			<table class=table>
-				<tr>
-					<th> Name(VBB) </th>
-					<th> VBB_id </th>
-					<th> Treffer in OSM </th>
-					<th> Lat (VBB) </th>
-					<th> Lon (VBB) </th>
-					<th> Zuletz geprueft </th>
-					<th> Auf OSM Karte </th>
-                    <th> Nochmal prüfen </th>
-                    <th> Karte der Funde </th>
-				</tr>
-				{% for stop in stops %}
-				{% if stop.matches > 0 %}
-				<tr class="match">
-					{% else %}
-					<tr class="nomatch">
+			<div class="container">
+				<div class=row-fluid>
+					<div class=span12>
+						<p> Prüft auf Basis der Haltestellendaten von
+						<a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">
+							http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt
+						</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein,
+						kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt,
+						oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!
+						</p>
+						<p> 
+						Wenn ihr Fehler im Programm oder Falscheinstufungen findet
+						dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.
+						</p>
+						<p> Viel Spaß :) </p>
+					</div>
+				</div>
+				<div class=row-fluid>
+					<div class=span6>
+						{% if pages %}
+						<h2>Statistik</h2>
+						Insgesamt: {{ pages  }}
+						In OSM: {{ matches_count }}
+						Nicht in OSM: {{ pages - matches_count }}
 						{% endif %}
-						<th> {{ stop.name }}</th>
-						<th> {{ stop.id }}</th>
-						<th> {{ stop.matches }}</th>
-						<th> {{ stop.lat }}</th>
-						<th> {{ stop.lon }}</th>
-						<th> {{ stop.last_run }}</th>
-						<th> <a href="#" onclick="radiusmap({{ stop.lat }}, {{ stop.lon }});">Position laut VBB</a></th>
-						<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
-						<th> <a href="{{ stop.turbo_url }}" target="_blank"> Karte </a> </th>
+					</div>
+					<div class=span6>
+						<h2> Landkreis wechseln </h2>
+						<select id="landkreis-picker" name="landkreis" onchange="change_landkreis();">
+							{% for landkreis in landkreise %}
+							<option {% if landkreis==city %} selected {% endif %} value="{{ landkreis }}">{{ landkreis }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class=row-fluid>
+					<div class=span12>
+						<h2> Anzeigekriterien</h2>
+						<label class="checkbox pull-left">
+							<input type="checkbox" id="match" name="match" checked>Zeige Stationen, die in OSM sind
+						</label>
+						<label class="checkbox pull-left">
+							<input type="checkbox" id="nomatch" name="nomatch" checked>Zeige Stationen, die nicht in OSM sind
+						</label>
+					</div>
+				</div>
+				{% if pages %}
+				<div class="pagination pagination-centered">
+					<ul>
+						<li><a href="/city/{{ city }}/page/{{ this_page-1 }}">Zurück</a></li>
+						{% if this_page-5 > 0 -%}
+						<li><a href="/city/{{city}}/page/1">1</a></li>
+						<li class="disabled"><a href="#">...</a></li>
+						{%- endif %}
+						{% for page_number in range(1, (pages/50)|int) -%}
+						{% if page_number == this_page -%}
+						<li class="active"><a href="/city/{{ city }}/{{ page_number }}">{{ page_number }}</a></li>
+						{% else -%}
+						{% if this_page - page_number < 5 and this_page - page_number > -5 %} 
+						<li><a href="/city/{{city}}/page/{{ page_number }}">{{ page_number }}</a></li>
+						{% endif %}
+						{%- endif %}
+						{%- endfor %}
+						{% if this_page+5 < pages -%}
+						<li class="disabled"><a href="#">...</a></li>
+						<li><a href="/city/{{city}}/page/{{ (pages/50)|int }}">{{ (pages/50)|int }}</a></li>
+						{%- endif %}
+						<li><a href="/city/{{city}}/page/{{ this_page+1 }}">Vor</a></li>
+					</ul>
+				</div>
+				{% endif %}
+				<p style="text-align: center"> Insgesamt <span id="total"> 0 </span> Haltestellen. Davon <span id="nomatch_total"> 0 </span> nicht gefunden.
+
+				<table class=table>
+					<tr>
+						<th> Name(VBB) </th>
+						<th> VBB_id </th>
+						<th> Treffer in OSM </th>
+						<th> Lat (VBB) </th>
+						<th> Lon (VBB) </th>
+						<th> Zuletz geprueft </th>
+						<th> Auf OSM Karte </th>
+						<th> Nochmal prüfen </th>
+						<th> Karte der Funde </th>
 					</tr>
-					{% endfor %}
-				</table>
+					{% for stop in stops %}
+					{% if stop.matches > 0 %}
+					<tr class="match">
+						{% else %}
+						<tr class="nomatch">
+							{% endif %}
+							<th> {{ stop.name }}</th>
+							<th> {{ stop.id }}</th>
+							<th> {{ stop.matches }}</th>
+							<th> {{ stop.lat }}</th>
+							<th> {{ stop.lon }}</th>
+							<th> {{ stop.last_run }}</th>
+							<th> <a href="#" onclick="radiusmap({{ stop.lat }}, {{ stop.lon }});">Position laut VBB</a></th>
+							<th> <a href="/recheck/{{ stop.id }}">Nochmal prüfen?</a></th>
+							<th> <a href="{{ stop.turbo_url }}" target="_blank"> Karte </a> </th>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
 			</div>
-		</div>
 
-		<div id="own_area_modal" class="modal hide fade">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h3>Eigenen Bereich festlegen</h3>
-			</div>
-			<div class="modal-body">
-				<div class="modal_map" id="map_picker"></div>
+			<div id="own_area_modal" class="modal hide fade">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h3>Eigenen Bereich festlegen</h3>
+				</div>
+				<div class="modal-body">
+					<div class="modal_map" id="map_picker"></div>
+				</div>
+
+				<div class="modal-footer">
+					<a href='javascript:own_area("problemsonly");' class="btn btn-danger">Zeige nur fehlende </a>
+					<a href='javascript:own_area("matchesonly");' class="btn btn-success">Zeige nur vorhandene </a>
+					<a href='javascript:own_area("all");' class="btn btn-primary" id=own_area_submit>Zeige alle Stationen</a>
+				</div>
 			</div>
 
-			<div class="modal-footer">
-				<a href='javascript:own_area("problemsonly");' class="btn btn-danger">Zeige nur fehlende </a>
-				<a href='javascript:own_area("matchesonly");' class="btn btn-success">Zeige nur vorhandene </a>
-				<a href='javascript:own_area("all");' class="btn btn-primary" id=own_area_submit>Zeige alle Stationen</a>
+			<div id="search_radius" class="modal hide fade">
+				<div class="modal-body">
+					<div id="radius_map" class="modal_map"></div>
+				</div>
+				<div class=modal-footer>
+					<a id="remote_edit_link" class="btn btn-primary" target="_blank">Mit JOSM/Merkaator bearbeiten </a>
+				</div>
 			</div>
-		</div>
-
-		<div id="search_radius" class="modal hide fade">
-			<div class="modal-body">
-				<div id="radius_map" class="modal_map"></div>
-			</div>
-			<div class=modal-footer>
-				<a id="remote_edit_link" class="btn btn-primary" target="_blank">Mit JOSM/Merkaator bearbeiten </a>
-			</div>
-		</div>
-		{% endblock %}
-		<a href="https://github.com/k-nut/osm-vbb-checker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-		<!-- Piwik -->
-		<script type="text/javascript">
-			var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.k-nut.eu/" : "http://piwik.k-nut.eu/");
-			document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-			</script>
+			{% endblock %}
+			<a class="hidden-phone" href="https://github.com/k-nut/osm-vbb-checker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+			<!-- Piwik -->
 			<script type="text/javascript">
-				try {
-					var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 4);
-					piwikTracker.trackPageView();
-					piwikTracker.enableLinkTracking();
-				}
+				var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.k-nut.eu/" : "http://piwik.k-nut.eu/");
+				document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+				</script>
+				<script type="text/javascript">
+					try {
+						var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 4);
+						piwikTracker.trackPageView();
+						piwikTracker.enableLinkTracking();
+					}
 catch( err ) {}
 </script>
 <noscript>

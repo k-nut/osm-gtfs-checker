@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-with open('./shapes.txt', 'r') as f:
+with open('./data/GTF_VBB_BVG_20110530/shapes.txt', 'r') as f:
     current_id = None
     current_points = []
     for line in f.readlines():

@@ -67,15 +67,15 @@
 
 				// recover previous filters
 				params = get_parameters();
-				if (params["nomatch"] == "true")
-				{
-					$("#match").attr("checked", false);
-					hiderows($("#match"));
-				}
-				if (params["match"] == "true")
+				if (params["nomatch"] != "true")
 				{
 					$("#nomatch").attr("checked", false);
 					hiderows($("#nomatch"));
+				}
+				if (params["match"] != "true")
+				{
+					$("#match").attr("checked", false);
+					hiderows($("#match"));
 				}
 
 				initmap();

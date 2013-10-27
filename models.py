@@ -4,7 +4,7 @@
 import requests
 
 from flask import Flask, json
-from flask_sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 
 import config
 from match_exceptions import match_exceptions

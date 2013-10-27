@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 import requests
 from flask import redirect, url_for, \
@@ -207,7 +207,7 @@ def recheck_batch(Stops):
     counter = 0
     for Stop in Stops:
         counter += 1
-        print "%*i/%*i " % (digits, counter, digits, number_of_stops),
+        print("%*i/%*i " % (digits, counter, digits, number_of_stops))
         out = recheck(Stop.id, from_cm_line=True)
         if out > 0:
             total += 1

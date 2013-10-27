@@ -22,14 +22,14 @@ def get_landkreis(lat, lon):
 
 def print_success(message):
     ''' Print the message in green '''
-    print '\033[1;32m%s\033[1;m' % (message)
+    print('\033[1;32m%s\033[1;m' % (message))
 
 
 def print_failure(message):
     ''' Print the message in red '''
-    print '\033[1;31m%s\033[1;m' % (message)
+    print('\033[1;31m%s\033[1;m' % (message))
 
 
 def print_info(message):
     ''' Print the message in yellow '''
-    print '\033[1;33m%s\033[1;m' % (message)
+    print('\033[1;33m%s\033[1;m' % (message))

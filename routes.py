@@ -7,6 +7,7 @@ from flask import redirect, url_for, \
 import datetime
 import logging
 import sys
+import csv
 from math import log10
 
 from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
@@ -236,8 +237,9 @@ def get_stops():
     all_ids = [stop.id for stop in all_stops]
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
     req = requests.get(url)
-    text = req.text.split("\n")[1:]
-    for line in text[35:]:  # start in line 35 to exlclude stops in Poland
+    text = req.text.split("\n")
+    reader = csv.DictReader(text, delimiter=',', quotechar='"')
+    for line in reader:  # start in line 35 to exlclude stops in Poland
         if len(line) > 1:
             Stop = VBB_Stop(line)
             if Stop.stop_id not in all_ids:

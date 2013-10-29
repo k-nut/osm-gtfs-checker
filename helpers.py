@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import simplejson
 import requests
 
 
@@ -9,7 +8,7 @@ def get_landkreis(lat, lon):
     ''' Takes lat and lon and returns the coresponding Landkreis '''
     payload = {"data": "[output:json];is_in(%f, %f);out;" % (lat, lon)}
     r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-    x = simplejson.loads(r.text)
+    x = r.json()
     output = {}
     for l in x.get("elements"):
         if "admin_level" in l["tags"]:

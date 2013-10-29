@@ -154,8 +154,8 @@ class VBB_Stop():
         logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
         payload = self.create_payload()
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-        this_json = json.loads(r.text)
-        stations = this_json.get("elements")
+        overpass_response = r.json()
+        stations = overpass_response.get("elements")
         return len(stations)
 
 
@@ -188,8 +188,9 @@ class Bvg_line():
     def is_in_osm(self):
         payload = {"data":'[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-        if "tags" in r.text:
-            return r.text.split('"name": "')[1].split('"')[0]
+        overpass_response = r.json()
+        if "tags" in overpass_response:
+            return r.get("name")[0]
         else:
             return False
 

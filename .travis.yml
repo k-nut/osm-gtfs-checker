@@ -1,0 +1,9 @@
+language: python
+python:
+        - "3.3"
+install:
+        - pip install requirements.txt
+        - pip install pep8 --use-mirrors
+script:
+        - "pep8 --exclude=migrations --ignore=E501,E225 src"
+        - pyflakes .

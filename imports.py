@@ -11,16 +11,16 @@ def create_agency_db():
         content = infile.readlines()
     for line in content[1:]:
         fields = line.split(",")
-        print unicode(fields[1])
+        print(fields[1])
         a = Agency(int(fields[0]), fields[1], fields[2], fields[3])
         db.session.add(a)
     db.session.commit()
-    print "Done!"
+    print("Done!")
 
 
 def get_agency(id):
     this_agency = Agency.query.filter_by(id=id).first()
-    print this_agency
+    print(this_agency)
 
 
 if __name__ == "__main__":

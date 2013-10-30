@@ -13,4 +13,3 @@ with open('./data/GTF_VBB_BVG_20110530/shapes.txt', 'r') as f:
             #save to db...
         else:
             current_points.append((lat, lon))
-

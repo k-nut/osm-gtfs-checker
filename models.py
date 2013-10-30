@@ -185,7 +185,7 @@ class Bvg_line():
                 self.transit_type = self.agency
 
     def is_in_osm(self):
-        payload = {"data": '[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
+        payload = {"data": '[output:json];relation["network"="VBB"]["ref"="%s"];out;' % self.line_number}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         overpass_response = r.json()
         if "tags" in overpass_response:

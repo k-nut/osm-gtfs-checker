@@ -33,12 +33,12 @@ def main():
 def pagination(number, city="Berlin"):
     """ Render only 100 stops for better overview"""
     number = int(number)
-    start = (number-1)*50
-    stop = number * 50
+    start = (number - 1) * 50
+    end = number * 50
     q = DB_Stop.query\
         .filter(DB_Stop.landkreis == city)\
         .order_by("last_run desc").all()
-    Stops = q[start:stop]
+    Stops = q[start:end]
     all_stops = len(q)
     matches = len([stop for stop in q if stop.matches > 0])
     landkreise = list(set([stop.landkreis for stop in
@@ -143,9 +143,9 @@ def recheck(id, from_cm_line=False):
     db.session.commit()
     if not from_cm_line:
         logging.info("[recheck] Name: %-5s; Old: %-3i; New: %-3i; IP: %-3s" % (stop.name,
-                                                                       old_matches,
-                                                                       stop.matches,
-                                                                       request.remote_addr))
+                                                                               old_matches,
+                                                                               stop.matches,
+                                                                               request.remote_addr))
         return redirect(url_for("pagination", number=1, city=stop.landkreis))
     else:
         if stop.matches > 0:

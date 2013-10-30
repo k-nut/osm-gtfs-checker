@@ -3,7 +3,7 @@
 
 import requests
 
-from flask import Flask, json
+from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import config
@@ -11,7 +11,6 @@ from match_exceptions import match_exceptions
 import logging
 
 import os
-import re
 import datetime
 
 from helpers import get_landkreis
@@ -95,7 +94,7 @@ class VBB_Stop():
         self.lat = float(line_from_stops_txt["stop_lat"])
         self.lon = float(line_from_stops_txt["stop_lon"])
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
-                            self.create_payload()["data"].replace("out skel;", "out;")
+                         self.create_payload()["data"].replace("out skel;", "out;")
 
     def get_short_name(self):
         short_name = self.name
@@ -186,7 +185,7 @@ class Bvg_line():
                 self.transit_type = self.agency
 
     def is_in_osm(self):
-        payload = {"data":'[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
+        payload = {"data": '[output:json];relation["network"="VBB"]["ref"="%s"];out;'% self.line_number}
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         overpass_response = r.json()
         if "tags" in overpass_response:

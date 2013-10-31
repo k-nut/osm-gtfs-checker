@@ -10,7 +10,7 @@ import sys
 import csv
 from math import log10
 
-from models import DB_Stop, DB_Train, VBB_Stop, Bvg_line, app, db
+from models import Stop, DB_Train, Bvg_line, app, db
 from helpers import print_success, print_failure
 
 
@@ -35,18 +35,18 @@ def pagination(number, city="Berlin"):
     number = int(number)
     start = (number - 1) * 50
     end = number * 50
-    q = DB_Stop.query\
-        .filter(DB_Stop.landkreis == city)\
+    q = Stop.query\
+        .filter(Stop.landkreis == city)\
         .order_by("last_run desc").all()
     Stops = q[start:end]
     all_stops = len(q)
     matches = len([stop for stop in q if stop.matches > 0])
     landkreise = list(set([stop.landkreis for stop in
-                           DB_Stop.query.all()]))
+                           Stop.query.all()]))
     landkreise.sort()
 
     for stop in Stops:
-        stop.turbo_url = VBB_Stop(stop.to_vbb_syntax()).turbo_url
+        stop.turbo_url = stop.turbo_url
 
     return render_template("index.html",
                            city=city,
@@ -61,10 +61,10 @@ def pagination(number, city="Berlin"):
 @app.route("/search/<query>")
 def search(query):
     """ Return a list with all the stops that match the query"""
-    Stops = DB_Stop.query.filter(DB_Stop.name.like("%" + query + "%")).all()
+    Stops = Stop.query.filter(Stop.name.like("%" + query + "%")).all()
 
     for stop in Stops:
-        stop.turbo_url = VBB_Stop(stop.to_vbb_syntax()).turbo_url
+        stop.turbo_url = stop.turbo_url
 
     return render_template("index.html", stops=Stops, pages=False)
 
@@ -74,26 +74,26 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     ''' Only show stops within a given bounding box. Allow filtering by
     matches/nomatches'''
     if show_only == "problemsonly":
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches == 0
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
+            Stop.matches == 0
         ).all()
 
     elif show_only == "matchesonly":
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches > 0
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
+            Stop.matches > 0
         ).all()
     else:
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
         ).all()
 
     landkreise = list(set([stop.landkreis for stop in
-                           DB_Stop.query.all()]))
+                           Stop.query.all()]))
     landkreise.sort()
     return render_template("index.html",
                            stops=result,
@@ -106,22 +106,22 @@ def json_stops(show_only, north, east, south, west):
     ''' Only show stops within a given bounding box. Allow filtering by
     matches/nomatches'''
     if show_only == "problemsonly":
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches == 0
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
+            Stop.matches == 0
         ).all()
 
     elif show_only == "matchesonly":
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
-            DB_Stop.matches > 0
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
+            Stop.matches > 0
         ).all()
     else:
-        result = DB_Stop.query.filter(
-            DB_Stop.lat.between(float(south), float(north)),
-            DB_Stop.lon.between(float(west), float(east)),
+        result = Stop.query.filter(
+            Stop.lat.between(float(south), float(north)),
+            Stop.lon.between(float(west), float(east)),
         ).all()
 
     all_stops = []
@@ -136,9 +136,9 @@ def json_stops(show_only, north, east, south, west):
 @app.route("/recheck/<id>")
 def recheck(id, from_cm_line=False):
     ''' Rerun the checks for a stop and update the db'''
-    stop = DB_Stop.query.filter_by(id=id).first()
+    stop = Stop.query.filter_by(id=id).first()
     old_matches = stop.matches
-    stop.matches = VBB_Stop(stop.to_vbb_syntax()).is_in_osm()
+    stop.matches = stop.is_in_osm()
     stop.last_run = datetime.datetime.now().replace(microsecond=0)
     db.session.commit()
     if not from_cm_line:
@@ -165,11 +165,11 @@ def map_of_the_bad():
 @app.route("/api/stops")
 def api_stops():
     if request.args.get("matchesOnly"):
-        Stops = DB_Stop.query.filter(DB_Stop.matches >= 1).all()
+        Stops = Stop.query.filter(Stop.matches >= 1).all()
     elif request.args.get("noMatchesOnly"):
-        Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+        Stops = Stop.query.filter(Stop.matches < 1).all()
     else:
-        Stops = DB_Stop.query.all()
+        Stops = Stop.query.all()
 
     all_stops = []
     for stop in Stops:
@@ -216,47 +216,40 @@ def recheck_batch(Stops):
 
 
 def recheck_all_missings_stops():
-    Stops = DB_Stop.query.filter(DB_Stop.matches < 1).all()
+    Stops = Stop.query.filter(Stop.matches < 1).all()
     recheck_batch(Stops)
 
 
 def recheck_by_name(name):
-    Stops = DB_Stop.query.filter(DB_Stop.name.like("%" + name + "%"),
-                                 DB_Stop.matches < 1).all()
+    Stops = Stop.query.filter(Stop.name.like("%" + name + "%"),
+                              Stop.matches < 1).all()
     recheck_batch(Stops)
 
 
 def recheck_all():
-    Stops = DB_Stop.query.all()
+    Stops = Stop.query.all()
     recheck_batch(Stops)
 
 
 def get_stops():
     ''' The initial query to set up the stop db '''
-    all_stops = DB_Stop.query.all()
+    all_stops = Stop.query.all()
     all_ids = [stop.id for stop in all_stops]
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
     req = requests.get(url)
     text = req.text.split("\n")
     reader = csv.DictReader(text, delimiter=',', quotechar='"')
     for line in reader:  # start in line 35 to exlclude stops in Poland
-        if len(line) > 1:
-            Stop = VBB_Stop(line)
-            if Stop.stop_id not in all_ids:
-                feedback = Stop.is_in_osm()
-                if feedback > 0:
-                    print_success(Stop.name + ": " + str(feedback))
-                else:
-                    print_failure(Stop.name + ":  0")
-                new_stop = DB_Stop(
-                    name=Stop.name,
-                    lat=Stop.lat,
-                    lon=Stop.lon,
-                    matches=feedback,
-                    vbb_id=Stop.stop_id
-                )
-                db.session.add(new_stop)
-                db.session.commit()
+        stop = Stop(line)
+        if stop.id not in all_ids:
+            stop.matches = stop.is_in_osm()
+            if stop.matches > 0:
+                print_success(stop.name + ": " + str(stop.matches))
+            else:
+                print_failure(stop.name + ":  0")
+            stop.last_run = datetime.datetime.now().replace(microsecond=0)
+            db.session.add(stop)
+            db.session.commit()
 
 
 if __name__ == "__main__":

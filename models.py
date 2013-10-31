@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import requests
@@ -38,7 +38,7 @@ class Agency(db.Model):
         return rep.encode("utf-8")
 
 
-class DB_Stop(db.Model):
+class Stop(db.Model):
     ''' The represenation of a stop in the database '''
     id = db.Column(db.Integer, primary_key=True)
     last_run = db.Column(db.DateTime)
@@ -47,15 +47,16 @@ class DB_Stop(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     landkreis = db.Column(db.String)
+    turbo_url = db.Column(db.String)
 
-    def __init__(self, vbb_id, name, lat, lon, matches):
-        self.id = vbb_id
-        self.name = name
-        self.lat = lat
-        self.lon = lon
-        self.matches = int(matches)
-        self.last_run = datetime.datetime.now().replace(microsecond=0)
-        kreise = get_landkreis(lat, lon)
+    def __init__(self, line_from_stops_txt):
+        self.id = int(line_from_stops_txt["stop_id"])
+        self.name = line_from_stops_txt["stop_name"]
+        self.lat = float(line_from_stops_txt["stop_lat"])
+        self.lon = float(line_from_stops_txt["stop_lon"])
+        self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
+                         self.create_payload()["data"].replace("out skel;", "out;")
+        kreise = get_landkreis(self.lat, self.lon)
         if 6 in kreise:
             self.landkreis = kreise[6]
         elif 4 in kreise:
@@ -63,38 +64,9 @@ class DB_Stop(db.Model):
         else:
             self.landkreis = "Unknown"
 
-    def to_vbb_syntax(self):
-        ''' Return a line that looks as if it comes from the routes.txt '''
-        dictionary = {}
-        dictionary["stop_id"] = self.id
-        dictionary["stop_name"] = self.name
-        dictionary["stop_lat"] = self.lat
-        dictionary["stop_lon"] = self.lon
-        return dictionary
-        #return u'%i,,"%s",,%f,%f' % (self.id, self.name, self.lat, self.lon)
-
-    def __repr__(self):
-        return '<Stop %r>' % self.name
-
-    def to_dict(self):
-        return {
-            "lat": self.lat,
-            "lon": self.lon,
-            "name": self.name,
-            "matches": self.matches
-        }
-
-
-class VBB_Stop():
-    ''' Takes a line from the stops.txt and returns a VBB_Stop object '''
-    def __init__(self, line_from_stops_txt):
-        #since csvreader doesnt understand unicode we'll just use good ol regex
-        self.stop_id = int(line_from_stops_txt["stop_id"])
-        self.name = line_from_stops_txt["stop_name"]
-        self.lat = float(line_from_stops_txt["stop_lat"])
-        self.lon = float(line_from_stops_txt["stop_lon"])
-        self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
-                         self.create_payload()["data"].replace("out skel;", "out;")
+    def update(self):
+        self.matches = self.is_in_osm()
+        self.last_run = datetime.datetime.now().replace(microsecond=0)
 
     def get_short_name(self):
         short_name = self.name
@@ -103,8 +75,8 @@ class VBB_Stop():
         # <name of the village>, Bahnhof.
         # in osm those are just the village name without the "Bahnhof"
         # so we filter for that special case
-        if self.stop_id in match_exceptions:
-            short_name = match_exceptions[self.stop_id]
+        if self.id in match_exceptions:
+            short_name = match_exceptions[self.id]
 
         if short_name.endswith(", Bahnhof"):
             short_name = short_name.split(", Bahnhof")[0]
@@ -156,6 +128,17 @@ class VBB_Stop():
         overpass_response = r.json()
         stations = overpass_response.get("elements")
         return len(stations)
+
+    def to_dict(self):
+        return {
+            "lat": self.lat,
+            "lon": self.lon,
+            "name": self.name,
+            "matches": self.matches
+        }
+
+    def __repr__(self):
+        return '<Stop %r>' % self.name
 
 
 class Bvg_line():

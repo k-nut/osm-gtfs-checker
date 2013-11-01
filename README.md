@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/k-nut/osm-vbb-checker.png?branch=master)](https://travis-ci.org/k-nut/osm-vbb-checker)
 osm-vbb-checker
 ===============
 

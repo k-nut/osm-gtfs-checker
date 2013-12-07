@@ -124,11 +124,10 @@ def json_stops(show_only, north, east, south, west):
             Stop.lon.between(float(west), float(east)),
         ).all()
 
-    all_stops = []
-    for stop in result:
-        all_stops.append(stop.to_dict())
-        if len(all_stops) > 100:
-            return jsonify(stops="Too many")
+    if len(result) > 200:
+        return jsonify(stops="Too many")
+
+    all_stops = [stop.to_dict() for stop in result]
 
     return jsonify(stops=all_stops)
 
@@ -237,9 +236,10 @@ def get_stops():
     all_ids = [stop.id for stop in all_stops]
     url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
     req = requests.get(url)
-    text = req.text.split("\n")
+    req.encoding = 'utf-8'
+    text = req.text.split('\n')
     reader = csv.DictReader(text, delimiter=',', quotechar='"')
-    for line in reader:  # start in line 35 to exlclude stops in Poland
+    for line in reader:
         stop = Stop(line)
         if stop.id not in all_ids:
             stop.matches = stop.is_in_osm()

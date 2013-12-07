@@ -19,7 +19,23 @@ function initmap() {
 
 function get_markers() {
 	var box = map.getBounds();
-	$.getJSON("/api/jsonstops/all/" +
+    var isMissingStopsChecked = $(".leaflet-control-layers-overlays label input").eq(0).is(':checked');
+    var isExistingStopsChecked = $(".leaflet-control-layers-overlays label input").eq(1).is(':checked');
+
+    var filter;
+
+    if (isMissingStopsChecked && isExistingStopsChecked){
+        filter = 'all';
+    }
+    else if (isMissingStopsChecked){
+        filter = 'problemsonly';
+    }
+    else if (isExistingStopsChecked){
+        filter = 'matchesonly';
+   }
+
+	$.getJSON("/api/jsonstops/" + 
+        filter +"/" +
 		box._northEast.lat + "/" + 
 		box._northEast.lng + "/" +
 		box._southWest.lat + "/" +

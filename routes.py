@@ -8,6 +8,7 @@ import datetime
 import logging
 import sys
 import csv
+import config
 from math import log10
 
 from models import Stop, DB_Train, Bvg_line, app, db
@@ -234,7 +235,7 @@ def get_stops():
     ''' The initial query to set up the stop db '''
     all_stops = Stop.query.all()
     all_ids = [stop.id for stop in all_stops]
-    url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
+    url = config.stops_txt_url
     req = requests.get(url)
     req.encoding = 'utf-8'
     text = req.text.split('\n')

@@ -182,24 +182,6 @@ def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])
 
 
-def get_trains():
-    ''' The initial query to set up the train db '''
-    url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/routes.txt"
-    req = requests.get(url)
-    text = req.text.split("\n")
-    for line in text:
-        Train = Bvg_line(line)
-        if Train.operator in ["BVG", "DB"]:
-            feedback = Train.is_in_osm()
-            if feedback:
-                print_success(feedback)
-            else:
-                print_failure(Train.line_number + " is not in OSM")
-            db_rep = DB_Train()
-            db.session.add(db_rep)
-            db.session.commit()
-
-
 def recheck_batch(Stops):
     total = 0
     number_of_stops = len(Stops)
@@ -250,7 +232,7 @@ def get_stops():
                 print_failure(stop.name + ":  0")
             stop.last_run = datetime.datetime.now().replace(microsecond=0)
             db.session.add(stop)
-            db.session.commit()
+    db.session.commit()
 
 
 if __name__ == "__main__":

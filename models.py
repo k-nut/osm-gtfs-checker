@@ -20,24 +20,6 @@ path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 db = SQLAlchemy(app)
 
-
-class Agency(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256))
-    url = db.Column(db.String(256))
-    timezone = db.Column(db.String(256))
-
-    def __init__(self, id, name, url, timezone):
-        self.id = id
-        self.name = name
-        self.url = url
-        self.timezone = timezone
-
-    def __repr__(self):
-        rep = "<Agency> %s, [%i]" % (self.name, self.id)
-        return rep.encode("utf-8")
-
-
 class Stop(db.Model):
     ''' The represenation of a stop in the database '''
     id = db.Column(db.Integer, primary_key=True)
@@ -139,54 +121,3 @@ class Stop(db.Model):
 
     def __repr__(self):
         return '<Stop %r>' % self.name
-
-
-class Bvg_line():
-    ''' Takes a line from routes.txt and return a Bvg_line object '''
-    def __init__(self, line_from_routes_txt):
-        fields = line_from_routes_txt.split(",")
-        self.bvg_id = fields[0]
-        self.agency = fields[1][:3]
-        self.line_number = fields[2]
-        #operator
-        if self.agency.startswith("BV"):
-            self.operator = "BVG"
-        elif self.agency.startswith("DB"):
-            self.operator = "DB"
-        else:
-            self.operator = "other"
-            #transit_type (Bus/tram/etc.)
-            if self.agency.endswith("T"):
-                self.transit_type = "Tram"
-            elif self.agency.endswith("S"):
-                self.transit_type = "S-Bahn"
-            elif self.agency.endswith("B"):
-                self.transit_type = "Bus"
-            elif self.agency.endswith("F"):
-                self.transit_type = "Faehre"
-            else:
-                self.transit_type = self.agency
-
-    def is_in_osm(self):
-        payload = {"data": '[output:json];relation["network"="VBB"]["ref"="%s"];out;' % self.line_number}
-        r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-        overpass_response = r.json()
-        if "tags" in overpass_response:
-            return r.get("name")[0]
-        else:
-            return False
-
-
-class DB_Train():
-    id = db.Column(db.Integer, primary_key=True)
-    agency = db.Column(db.String(200))
-    operator = db.Column(db.String(200))
-    transit_type = db.Column(db.String(200))
-    in_osm = db.Column(db.Boolean)
-
-    def __init__(self, vbb_id, agency, operator, transit_type, in_osm):
-        self.id = id
-        self.agency = agency
-        self.operator = operator
-        self.transit_type = transit_type
-        self.in_osm = in_osm

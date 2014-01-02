@@ -7,7 +7,6 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import config
-from match_exceptions import match_exceptions
 import logging
 
 import os
@@ -20,6 +19,7 @@ path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 db = SQLAlchemy(app)
 
+
 class Stop(db.Model):
     ''' The represenation of a stop in the database '''
     id = db.Column(db.Integer, primary_key=True)
@@ -30,12 +30,14 @@ class Stop(db.Model):
     lon = db.Column(db.Float)
     landkreis = db.Column(db.String)
     turbo_url = db.Column(db.String)
+    exception = db.Column(db.String)
 
-    def __init__(self, line_from_stops_txt):
+    def __init__(self, line_from_stops_txt, exception=None):
         self.id = int(line_from_stops_txt["stop_id"])
         self.name = line_from_stops_txt["stop_name"]
         self.lat = float(line_from_stops_txt["stop_lat"])
         self.lon = float(line_from_stops_txt["stop_lon"])
+        self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
                          self.create_payload()["data"].replace("out skel;", "out;")
         kreise = get_landkreis(self.lat, self.lon)
@@ -57,9 +59,6 @@ class Stop(db.Model):
         # <name of the village>, Bahnhof.
         # in osm those are just the village name without the "Bahnhof"
         # so we filter for that special case
-        if self.id in match_exceptions:
-            short_name = match_exceptions[self.id]
-
         if short_name.endswith(", Bahnhof"):
             short_name = short_name.split(", Bahnhof")[0]
 

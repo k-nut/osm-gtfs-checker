@@ -11,7 +11,7 @@ import csv
 import config
 from math import log10
 
-from models import Stop, DB_Train, Bvg_line, app, db
+from models import Stop, app, db
 from helpers import print_success, print_failure
 
 

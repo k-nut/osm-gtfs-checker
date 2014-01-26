@@ -234,7 +234,7 @@ def get_stops():
                 print_failure(stop.name + ":  0")
             stop.last_run = datetime.datetime.now().replace(microsecond=0)
             db.session.add(stop)
-            counter =+ 1
+            counter += 1
             if counter % 20 == 0:
                 db.session.commit()
 

@@ -38,7 +38,11 @@ class Stop(db.Model):
         self.name = line_from_stops_txt["stop_name"]
         self.lat = float(line_from_stops_txt["stop_lat"])
         self.lon = float(line_from_stops_txt["stop_lon"])
-        self.isStation = bool(int(line_from_stops_txt["location_type"]))
+        parent_station = line_from_stops_txt["parent_station"]
+        if parent_station == "":
+            self.isStation = True
+        else:
+            self.isStaion = False
         self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
                          self.create_payload()["data"].replace("out skel;", "out;")

@@ -68,7 +68,7 @@ def search(query):
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
 
-    return render_template("index.html", stops=Stops, config=Config, pages=False)
+    return render_template("index.html", stops=Stops, config=config, pages=False)
 
 
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")
@@ -223,6 +223,7 @@ def get_stops():
     req.encoding = 'utf-8'
     text = req.text.split('\n')
     reader = csv.DictReader(text, delimiter=',', quotechar='"')
+    counter = 0
     for line in reader:
         stop = Stop(line)
         if stop.isStation and stop.id not in all_ids:
@@ -233,7 +234,9 @@ def get_stops():
                 print_failure(stop.name + ":  0")
             stop.last_run = datetime.datetime.now().replace(microsecond=0)
             db.session.add(stop)
-    db.session.commit()
+            counter =+ 1
+            if counter % 20 == 0:
+                db.session.commit()
 
 
 if __name__ == "__main__":

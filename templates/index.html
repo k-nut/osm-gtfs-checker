@@ -105,8 +105,7 @@
 					</a>
 
 					<a class="brand" href="/">
-						<span class="hidden-phone">Berliner &amp; Brandenburger</span>
-						OSM-Haltestellen Validator
+            <span class="hidden-phone">{{config.name}}</span>
 					</a>
 					<div class="nav-collapse collapse">
 						<ul class="nav">
@@ -127,9 +126,8 @@
 		<div class=row-fluid>
 			<div class=span12>
 				<p> Prüft auf Basis der Haltestellendaten von
-					<a href="http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt">
-						http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt
-			</a>, ob diese in OSM sind oder nicht. Sollten sie es nicht sein,
+        <a href="{{config.stops_txt_url}}">{{config.stops_txt_url}}</a>,
+        ob diese in OSM sind oder nicht. Sollten sie es nicht sein,
 			kann das entweder daran liegen, dass dieses Tool sie schlicht nicht erkennt,
 			oder aber daran, dass sie wirklich nicht in OSM sind. Das sollten wir ändern!
 	</p>

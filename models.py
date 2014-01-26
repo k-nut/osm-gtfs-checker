@@ -7,7 +7,6 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 import config
-from match_exceptions import match_exceptions
 import logging
 
 import os
@@ -21,23 +20,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 db = SQLAlchemy(app)
 
 
-class Agency(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256))
-    url = db.Column(db.String(256))
-    timezone = db.Column(db.String(256))
-
-    def __init__(self, id, name, url, timezone):
-        self.id = id
-        self.name = name
-        self.url = url
-        self.timezone = timezone
-
-    def __repr__(self):
-        rep = "<Agency> %s, [%i]" % (self.name, self.id)
-        return rep.encode("utf-8")
-
-
 class Stop(db.Model):
     ''' The represenation of a stop in the database '''
     id = db.Column(db.Integer, primary_key=True)
@@ -48,12 +30,20 @@ class Stop(db.Model):
     lon = db.Column(db.Float)
     landkreis = db.Column(db.String)
     turbo_url = db.Column(db.String)
+    isStation = db.Column(db.Boolean)
+    exception = db.Column(db.String)
 
-    def __init__(self, line_from_stops_txt):
+    def __init__(self, line_from_stops_txt, exception=None):
         self.id = int(line_from_stops_txt["stop_id"])
         self.name = line_from_stops_txt["stop_name"]
         self.lat = float(line_from_stops_txt["stop_lat"])
         self.lon = float(line_from_stops_txt["stop_lon"])
+        parent_station = line_from_stops_txt["parent_station"]
+        if parent_station == "":
+            self.isStation = True
+        else:
+            self.isStaion = False
+        self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
                          self.create_payload()["data"].replace("out skel;", "out;")
         kreise = get_landkreis(self.lat, self.lon)
@@ -75,9 +65,6 @@ class Stop(db.Model):
         # <name of the village>, Bahnhof.
         # in osm those are just the village name without the "Bahnhof"
         # so we filter for that special case
-        if self.id in match_exceptions:
-            short_name = match_exceptions[self.id]
-
         if short_name.endswith(", Bahnhof"):
             short_name = short_name.split(", Bahnhof")[0]
 
@@ -139,54 +126,3 @@ class Stop(db.Model):
 
     def __repr__(self):
         return '<Stop %r>' % self.name
-
-
-class Bvg_line():
-    ''' Takes a line from routes.txt and return a Bvg_line object '''
-    def __init__(self, line_from_routes_txt):
-        fields = line_from_routes_txt.split(",")
-        self.bvg_id = fields[0]
-        self.agency = fields[1][:3]
-        self.line_number = fields[2]
-        #operator
-        if self.agency.startswith("BV"):
-            self.operator = "BVG"
-        elif self.agency.startswith("DB"):
-            self.operator = "DB"
-        else:
-            self.operator = "other"
-            #transit_type (Bus/tram/etc.)
-            if self.agency.endswith("T"):
-                self.transit_type = "Tram"
-            elif self.agency.endswith("S"):
-                self.transit_type = "S-Bahn"
-            elif self.agency.endswith("B"):
-                self.transit_type = "Bus"
-            elif self.agency.endswith("F"):
-                self.transit_type = "Faehre"
-            else:
-                self.transit_type = self.agency
-
-    def is_in_osm(self):
-        payload = {"data": '[output:json];relation["network"="VBB"]["ref"="%s"];out;' % self.line_number}
-        r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-        overpass_response = r.json()
-        if "tags" in overpass_response:
-            return r.get("name")[0]
-        else:
-            return False
-
-
-class DB_Train():
-    id = db.Column(db.Integer, primary_key=True)
-    agency = db.Column(db.String(200))
-    operator = db.Column(db.String(200))
-    transit_type = db.Column(db.String(200))
-    in_osm = db.Column(db.Boolean)
-
-    def __init__(self, vbb_id, agency, operator, transit_type, in_osm):
-        self.id = id
-        self.agency = agency
-        self.operator = operator
-        self.transit_type = transit_type
-        self.in_osm = in_osm

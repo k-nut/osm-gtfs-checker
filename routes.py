@@ -8,9 +8,10 @@ import datetime
 import logging
 import sys
 import csv
+import config
 from math import log10
 
-from models import Stop, DB_Train, Bvg_line, app, db
+from models import Stop, app, db
 from helpers import print_success, print_failure
 
 
@@ -54,7 +55,8 @@ def pagination(number, city="Berlin"):
                            pages=all_stops,
                            this_page=number,
                            matches_count=matches,
-                           landkreise=landkreise
+                           landkreise=landkreise,
+                           config=config
                            )
 
 
@@ -66,7 +68,7 @@ def search(query):
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
 
-    return render_template("index.html", stops=Stops, pages=False)
+    return render_template("index.html", stops=Stops, config=config, pages=False)
 
 
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")
@@ -181,24 +183,6 @@ def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])
 
 
-def get_trains():
-    ''' The initial query to set up the train db '''
-    url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/routes.txt"
-    req = requests.get(url)
-    text = req.text.split("\n")
-    for line in text:
-        Train = Bvg_line(line)
-        if Train.operator in ["BVG", "DB"]:
-            feedback = Train.is_in_osm()
-            if feedback:
-                print_success(feedback)
-            else:
-                print_failure(Train.line_number + " is not in OSM")
-            db_rep = DB_Train()
-            db.session.add(db_rep)
-            db.session.commit()
-
-
 def recheck_batch(Stops):
     total = 0
     number_of_stops = len(Stops)
@@ -234,14 +218,15 @@ def get_stops():
     ''' The initial query to set up the stop db '''
     all_stops = Stop.query.all()
     all_ids = [stop.id for stop in all_stops]
-    url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
+    url = config.stops_txt_url
     req = requests.get(url)
     req.encoding = 'utf-8'
     text = req.text.split('\n')
     reader = csv.DictReader(text, delimiter=',', quotechar='"')
+    counter = 0
     for line in reader:
         stop = Stop(line)
-        if stop.id not in all_ids:
+        if stop.isStation and stop.id not in all_ids:
             stop.matches = stop.is_in_osm()
             if stop.matches > 0:
                 print_success(stop.name + ": " + str(stop.matches))
@@ -249,7 +234,9 @@ def get_stops():
                 print_failure(stop.name + ":  0")
             stop.last_run = datetime.datetime.now().replace(microsecond=0)
             db.session.add(stop)
-            db.session.commit()
+            counter += 1
+            if counter % 20 == 0:
+                db.session.commit()
 
 
 if __name__ == "__main__":

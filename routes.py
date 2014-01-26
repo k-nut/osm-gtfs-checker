@@ -55,7 +55,8 @@ def pagination(number, city="Berlin"):
                            pages=all_stops,
                            this_page=number,
                            matches_count=matches,
-                           landkreise=landkreise
+                           landkreise=landkreise,
+                           config=config
                            )
 
 
@@ -67,7 +68,7 @@ def search(query):
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
 
-    return render_template("index.html", stops=Stops, pages=False)
+    return render_template("index.html", stops=Stops, config=Config, pages=False)
 
 
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")
@@ -224,7 +225,7 @@ def get_stops():
     reader = csv.DictReader(text, delimiter=',', quotechar='"')
     for line in reader:
         stop = Stop(line)
-        if stop.id not in all_ids:
+        if stop.isStation and stop.id not in all_ids:
             stop.matches = stop.is_in_osm()
             if stop.matches > 0:
                 print_success(stop.name + ": " + str(stop.matches))

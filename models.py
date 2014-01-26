@@ -30,6 +30,7 @@ class Stop(db.Model):
     lon = db.Column(db.Float)
     landkreis = db.Column(db.String)
     turbo_url = db.Column(db.String)
+    isStation = db.Column(db.Boolean)
     exception = db.Column(db.String)
 
     def __init__(self, line_from_stops_txt, exception=None):
@@ -37,6 +38,7 @@ class Stop(db.Model):
         self.name = line_from_stops_txt["stop_name"]
         self.lat = float(line_from_stops_txt["stop_lat"])
         self.lon = float(line_from_stops_txt["stop_lon"])
+        self.isStation = bool(int(line_from_stops_txt["location_type"]))
         self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
                          self.create_payload()["data"].replace("out skel;", "out;")

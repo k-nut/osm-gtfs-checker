@@ -182,12 +182,12 @@ def api_stops():
 def match_exceptions():
     if request.method == "POST":
         if request.form["id"] and request.form["string"]:
-            stop = Stop.query.filter_by(id=int(request.form["id"])).first()
-            stop.exception = request.form["string"]
+            selected_stop = Stop.query.filter_by(id=int(request.form["id"])).first()
+            selected_stop.exception = request.form["string"]
             db.session.commit()
             return redirect(url_for("match_exceptions"))
     all_stops = Stop.query.all()
-    exceptions = [Stop for Stop in all_stops if Stop.exception]
+    exceptions = [stop for stop in all_stops if stop.exception]
     return render_template("exceptions.html", all_stops=all_stops, exceptions=exceptions)
 
 

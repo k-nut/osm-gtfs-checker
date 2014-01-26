@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1> Außnahmeregeln </h1>
+<form action="/exceptions" method=post>
+	<table>
+		<tr>
+			<th> SWU ID </th>
+			<th> Name in OSM </th>
+		</tr>
+{% for exception in exceptions %}
+<tr>
+  <td>{{exception.id}} {{exception.name}}</td>
+  <td>{{exception.exception}}</td>
+</tr>
+{% endfor %}
+<tr>
+  <td> <select name="id">
+      {% for stop in all_stops %}
+      <option value="{{stop.id}}">{{stop.id}} {{stop.name}}</option>
+      {% endfor %}
+    </select)>
+  </td>
+	<td> <input name="string" type="string"   placeholder="HBF" /></td>
+<tr>
+  <td></td>
+  <td> <input type="submit"> </td>
+</table>
+</form>
+{% endblock %}
+

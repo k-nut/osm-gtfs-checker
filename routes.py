@@ -178,6 +178,19 @@ def api_stops():
     return jsonify(stops=all_stops)
 
 
+@app.route('/exceptions', methods=["get", "post"])
+def match_exceptions():
+    if request.method == "POST":
+        if request.form["id"] and request.form["string"]:
+            stop = Stop.query.filter_by(id=int(request.form["id"])).first()
+            stop.exception = request.form["string"]
+            db.session.commit()
+            return redirect(url_for("match_exceptions"))
+    all_stops = Stop.query.all()
+    exceptions = [Stop for Stop in all_stops if Stop.exception]
+    return render_template("exceptions.html", all_stops=all_stops, exceptions=exceptions)
+
+
 @app.route('/robots.txt')
 def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])

@@ -98,6 +98,10 @@ class Stop(db.Model):
             s_station = "S" + stop_name
             u_station = "U" + stop_name
             short_name = s_station + "|" + u_station
+
+        if self.exception:
+            short_name = short_name + "|" + self.exception
+
         return short_name
 
     def create_payload(self):

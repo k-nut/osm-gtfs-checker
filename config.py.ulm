@@ -1,0 +1,3 @@
+db_path = "./stops.db"
+stops_txt_url = "http://www.swu.de/fileadmin/gtfs/stops.txt"
+name = "Ulmer OSM Haltestellen-Validator"

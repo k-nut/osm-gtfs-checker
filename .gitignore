@@ -3,3 +3,4 @@
 *.log
 stops.db
 data/*
+config.py.*

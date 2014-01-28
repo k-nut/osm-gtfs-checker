@@ -1,18 +1,22 @@
 [![Build Status](https://travis-ci.org/k-nut/osm-vbb-checker.png?branch=master)](https://travis-ci.org/k-nut/osm-vbb-checker)
-osm-vbb-checker
+osm-gtfs-checker
 ===============
 
-Compares the public transit data in OSM to the data published by the VBB
+Compares the public transit data in OSM to the data published by a GTFS-provider.
 
 
-The VBB published some of its data under a cc-by license. This tool compares the stops (and at some point trains/buses/etc)
-to the data that is in osm.
 
 Requirements
 ------------
 - flask
 - flask-sqlalchemy
 - requests
+
+
+Setup
+-----
+There are two predefined config files. Those are for the city of Ulm and for Berlin. Simply rename one of them to ```config.py``` or create your own config file.
+
 
 Deploy
 ------

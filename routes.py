@@ -160,7 +160,7 @@ def recheck(id, from_cm_line=False):
 @app.route("/map_of_the_bad")
 def map_of_the_bad():
     ''' Return a map with all the stops that aren't in OSM '''
-    return render_template("map.html")
+    return render_template("map.html", config=config)
 
 
 @app.route("/api/stops")
@@ -188,7 +188,7 @@ def match_exceptions():
             return redirect(url_for("match_exceptions"))
     all_stops = Stop.query.all()
     exceptions = [stop for stop in all_stops if stop.exception]
-    return render_template("exceptions.html", all_stops=all_stops, exceptions=exceptions)
+    return render_template("exceptions.html", config=config, all_stops=all_stops, exceptions=exceptions)
 
 
 @app.route('/robots.txt')

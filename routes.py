@@ -99,6 +99,7 @@ def stops_in_bounding_box(show_only, north, east, south, west):
     landkreise.sort()
     return render_template("index.html",
                            stops=result,
+                           config=config,
                            landkreise=landkreise
                            )
 
@@ -157,8 +158,8 @@ def recheck(id, from_cm_line=False):
         return stop.matches
 
 
-@app.route("/map_of_the_bad")
-def map_of_the_bad():
+@app.route("/map")
+def map():
     ''' Return a map with all the stops that aren't in OSM '''
     return render_template("map.html", config=config)
 

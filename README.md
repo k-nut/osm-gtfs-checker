@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/k-nut/osm-vbb-checker.png?branch=master)](https://travis-ci.org/k-nut/osm-vbb-checker)
-osm-gtfs-checker
+[![Build Status](https://travis-ci.org/k-nut/osm-gtfs-checker.png?branch=master)](https://travis-ci.org/k-nut/osm-gtfs-checker)osm-gtfs-checker
 ===============
 
 Compares the public transit data in OSM to the data published by a GTFS-provider.

@@ -203,10 +203,10 @@ def recheck_batch(Stops):
     # get the number of digits we want to show
     digits = int(log10(number_of_stops)) + 1
     counter = 0
-    for Stop in Stops:
+    for stop in Stops:
         counter += 1
         print("%*i/%*i " % (digits, counter, digits, number_of_stops))
-        out = recheck(Stop.id, from_cm_line=True)
+        out = recheck(stop.id, from_cm_line=True)
         if out > 0:
             total += 1
     print_success("Insgesamt %i neue Treffer" % total)

@@ -14,8 +14,6 @@ def get_landkreis(lat, lon):
         if "admin_level" in l["tags"]:
             output[int(l["tags"]["admin_level"])] = \
                 l["tags"]["name"]
-            #if l["tags"]["admin_level"] in ["8","6"]:
-            #    return l["tags"]["name"]
     return output
 
 

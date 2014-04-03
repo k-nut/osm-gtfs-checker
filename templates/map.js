@@ -11,7 +11,7 @@ function initmap() {
 	var osm = new L.TileLayer(osmUrl, {minZoom: 4, maxZoom: 18, attribution: osmAttrib});
 
 	// start the map in South-East England
-	map.setView(new L.LatLng(52.52, 13.41),13);
+	map.setView(new L.LatLng({{ config.initial_map_cordinates["lat"] }}, {{ config.initial_map_cordinates["lon"] }}),13);
 	map.addLayer(osm);
 	var markers = { "Fehlende Haltestellen" : missingStops, "Vorhandene Haltestellen" : foundStops};
 	L.control.layers(null, markers).addTo(map);

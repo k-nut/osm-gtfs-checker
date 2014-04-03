@@ -77,7 +77,8 @@
 					}
 				}
 
-				initmap();
+        initmap({{ config.initial_map_cordinates['lat']}}, {{
+        config.initial_map_cordinates['lon']}});
 				// We need to force leaflet into redrawing the map in order to
 				// show all tiles
 				$("#own_area_modal").on('shown', function()

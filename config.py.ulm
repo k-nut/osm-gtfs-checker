@@ -1,3 +1,4 @@
 db_path = "./stops.db"
 stops_txt_url = "http://www.swu.de/fileadmin/gtfs/stops.txt"
 name = "Ulmer OSM Haltestellen-Validator"
+initial_map_cordinates = {'lat': 48.35, 'lon': 10.00}

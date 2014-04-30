@@ -1,4 +1,8 @@
 function initmap(startLat, startLon) {
+  if (typeof(map) !== "undefined")
+  {
+    return;
+  }
   map = new L.Map('map_picker').setView([startLat, startLon], 10);
 
   // create the tile layer with correct attribution
@@ -97,7 +101,7 @@ function change_links(){
     parampart += "match=true";
   }
   $(".pagination a").each(function(){
-  var old_url, new_url;
+    var old_url, new_url;
     old_url = $(this).attr("href");
     if (old_url.indexOf("?") > -1){
       new_url = old_url.split("?")[0];

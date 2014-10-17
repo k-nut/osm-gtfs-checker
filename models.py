@@ -12,7 +12,7 @@ import logging
 import os
 import datetime
 
-from helpers import get_landkreis
+from helpers import get_county
 
 app = Flask(__name__, instance_relative_config=True)
 path_to_db = os.path.expanduser(config.db_path)
@@ -28,7 +28,7 @@ class Stop(db.Model):
     matches = db.Column(db.Float)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
-    landkreis = db.Column(db.String)
+    county = db.Column(db.String)
     turbo_url = db.Column(db.String)
     isStation = db.Column(db.Boolean)
     exception = db.Column(db.String)
@@ -46,13 +46,13 @@ class Stop(db.Model):
         self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
                          self.create_payload()["data"].replace("out skel;", "out;")
-        kreise = get_landkreis(self.lat, self.lon)
-        if 6 in kreise:
-            self.landkreis = kreise[6]
-        elif 4 in kreise:
-            self.landkreis = kreise[4]
+        counties = get_county(self.lat, self.lon)
+        if 6 in counties:
+            self.county = counties[6]
+        elif 4 in counties:
+            self.county = counties[4]
         else:
-            self.landkreis = "Unknown"
+            self.county = "Unknown"
 
     def update(self):
         self.matches = self.is_in_osm()

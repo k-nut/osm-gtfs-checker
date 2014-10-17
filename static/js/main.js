@@ -64,9 +64,9 @@ function search(){
   window.location = "/search/" + query;
 }
 
-function change_landkreis(){
-  var landkreis = $("#landkreis-picker").val();
-  window.location = "/city/" + landkreis + "/page/1";
+function change_county(){
+  var county = $("#county-picker").val();
+  window.location = "/city/" + county + "/page/1";
 }
 
 function own_area(showOnly){

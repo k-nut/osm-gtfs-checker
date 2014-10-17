@@ -4,8 +4,8 @@
 import requests
 
 
-def get_landkreis(lat, lon):
-    ''' Takes lat and lon and returns the coresponding Landkreis '''
+def get_county(lat, lon):
+    ''' Takes lat and lon and returns the coresponding county '''
     payload = {"data": "[output:json];is_in(%f, %f);out;" % (lat, lon)}
     r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
     x = r.json()

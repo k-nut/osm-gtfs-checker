@@ -37,14 +37,14 @@ def pagination(number, city="Berlin"):
     start = (number - 1) * 50
     end = number * 50
     q = Stop.query\
-        .filter(Stop.landkreis == city)\
+        .filter(Stop.county == city)\
         .order_by("last_run desc").all()
     Stops = q[start:end]
     all_stops = len(q)
     matches = len([stop for stop in q if stop.matches > 0])
-    landkreise = list(set([stop.landkreis for stop in
+    countys = list(set([stop.county for stop in
                            Stop.query.all()]))
-    landkreise.sort()
+    countys.sort()
 
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
@@ -55,7 +55,7 @@ def pagination(number, city="Berlin"):
                            pages=all_stops,
                            this_page=number,
                            matches_count=matches,
-                           landkreise=landkreise,
+                           countys=countys,
                            config=config
                            )
 
@@ -94,13 +94,13 @@ def stops_in_bounding_box(show_only, north, east, south, west):
             Stop.lon.between(float(west), float(east)),
         ).all()
 
-    landkreise = list(set([stop.landkreis for stop in
+    countys = list(set([stop.countys for stop in
                            Stop.query.all()]))
-    landkreise.sort()
+    countys.sort()
     return render_template("index.html",
                            stops=result,
                            config=config,
-                           landkreise=landkreise
+                           countys=countys
                            )
 
 
@@ -148,7 +148,7 @@ def recheck(id, from_cm_line=False):
                                                                                old_matches,
                                                                                stop.matches,
                                                                                request.remote_addr))
-        return redirect(url_for("pagination", number=1, city=stop.landkreis))
+        return redirect(url_for("pagination", number=1, city=stop.county))
     else:
         if stop.matches > 0:
             print_success("%s now matches %i stops" % (stop.name,

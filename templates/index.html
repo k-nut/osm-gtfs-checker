@@ -146,9 +146,9 @@ dann schreibt mir an <a href="mailto:knut@k-nut.eu">knut@k-nut.eu</a>.
 </div>
 <div class=span6>
 <h2> Landkreis wechseln </h2>
-<select id="landkreis-picker" name="landkreis" onchange="change_landkreis();">
-	{% for landkreis in landkreise %}
-<option {% if landkreis==city %} selected {% endif %} value="{{ landkreis }}">{{ landkreis }}</option>
+<select id="county-picker" name="county" onchange="change_county();">
+	{% for county in countys %}
+<option {% if county==city %} selected {% endif %} value="{{ county }}">{{ county }}</option>
 {% endfor %}
 					</select>
 			</div>

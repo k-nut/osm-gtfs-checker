@@ -94,7 +94,7 @@ def stops_in_bounding_box(show_only, north, east, south, west):
             Stop.lon.between(float(west), float(east)),
         ).all()
 
-    countys = list(set([stop.countys for stop in
+    countys = list(set([stop.county for stop in
                            Stop.query.all()]))
     countys.sort()
     return render_template("index.html",

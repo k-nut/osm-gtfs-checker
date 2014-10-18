@@ -45,14 +45,8 @@ class Stop(db.Model):
             self.isStaion = False
         self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
-                         self.create_payload()["data"].replace("out skel;", "out;")
-        counties = get_county(self.lat, self.lon)
-        if 6 in counties:
-            self.county = counties[6]
-        elif 4 in counties:
-            self.county = counties[4]
-        else:
-            self.county = "Unknown"
+            self.create_payload()["data"].replace("\n", "")
+        self.county = get_county(self.lat, self.lon)
 
     def update(self):
         self.matches = self.is_in_osm()

@@ -100,7 +100,18 @@ class Stop(db.Model):
 
     def create_payload(self):
         short_name = self.get_short_name()
-        payload = {"data": '[output:json];node(around: 250, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
+        payload = {"data": """
+        [out:json];
+        (
+        node(around: 250, %(lat)f, %(lon)f)
+        ["highway"="bus_stop"]; 
+        node(around: 250, %(lat)f, %(lon)f)
+        ["railway"="tram_stop"];
+        node(around: 250, %(lat)f, %(lon)f)
+        ["railway"="station"];
+        );
+        out;
+        """% {'lat': self.lat, 'lon':self.lon}}
         return payload
 
     def is_in_osm(self):

@@ -17,7 +17,7 @@ from helpers import print_success, print_failure
 
 logging.basicConfig(filename="rechecks.log",
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
+                    datefmt='%Y-%m-%d %H:%M',
                     level=logging.INFO)
 if "--verbose" in sys.argv:
     console = logging.StreamHandler(sys.stdout)

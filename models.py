@@ -104,14 +104,14 @@ class Stop(db.Model):
         [out:json];
         (
         node(around: 250, %(lat)f, %(lon)f)
-        ["highway"="bus_stop"]; 
+        ["highway"="bus_stop"];
         node(around: 250, %(lat)f, %(lon)f)
         ["railway"="tram_stop"];
         node(around: 250, %(lat)f, %(lon)f)
         ["railway"="station"];
         );
         out;
-        """% {'lat': self.lat, 'lon':self.lon}}
+        """ % {'lat': self.lat, 'lon': self.lon}}
         return payload
 
     def is_in_osm(self):

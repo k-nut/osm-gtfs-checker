@@ -13,15 +13,15 @@ def get_county(lat, lon):
     admin_level_to_name = {}
     for l in json_response["elements"]:
         if "admin_level" in l["tags"]:
-            admin_level_to_name[l["tags"]["admin_level"]] =  l["tags"]["name"]
+            admin_level_to_name[l["tags"]["admin_level"]] = l["tags"]["name"]
 
-    # for an explanation of the numbers see 
+    # for an explanation of the numbers see
     # http://wiki.openstreetmap.org/wiki/Admin_level
-    if '6' in admin_level_to_name: # in Germany this is a Landkreis
+    if '6' in admin_level_to_name:  # in Germany this is a Landkreis
         return admin_level_to_name['6']
 
-    if '4' in admin_level_to_name: # in Germany this is a Bundesland
-        # this is also used for Berlin which does not have a 
+    if '4' in admin_level_to_name:  # in Germany this is a Bundesland
+        # this is also used for Berlin which does not have a
         # Landkreis in the OSM data
         return admin_level_to_name['4']
 

@@ -131,15 +131,12 @@ class Stop(db.Model):
         names = [station["tags"]["name"] for station in stations if "tags" in station and "name" in station["tags"]]
         self.names_in_osm = json.dumps(names)
         matches = 0
-        runs = 0
         for name in names:
             for short_n in short_name.split("|"):
                 runs += 1
                 if difflib.SequenceMatcher(None, name, short_n).ratio() > 0.6:
-                    print(name, short_n)
                     matches += 1
                     break
-        print(runs)
         return matches
 
     def to_dict(self):

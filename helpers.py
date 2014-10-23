@@ -8,7 +8,6 @@ def get_county(lat, lon):
     ''' Takes lat and lon and returns the coresponding county '''
     payload = {"data": "[output:json];is_in(%f, %f);out;" % (lat, lon)}
     r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
-    print(r.url)
     json_response = r.json()
     admin_level_to_name = {}
     for l in json_response["elements"]:

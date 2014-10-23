@@ -133,7 +133,6 @@ class Stop(db.Model):
         matches = 0
         for name in names:
             for short_n in short_name.split("|"):
-                runs += 1
                 if difflib.SequenceMatcher(None, name, short_n).ratio() > 0.6:
                     matches += 1
                     break

@@ -109,6 +109,8 @@ class Stop(db.Model):
         ["railway"="tram_stop"];
         node(around: 250, %(lat)f, %(lon)f)
         ["railway"="station"];
+        node(around: 250, %(lat)f, %(lon)f)
+        ["public_transport"="stop_position"];
         );
         out;
         """ % {'lat': self.lat, 'lon': self.lon}}

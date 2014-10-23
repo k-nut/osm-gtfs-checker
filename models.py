@@ -11,6 +11,8 @@ import logging
 
 import os
 import datetime
+import difflib
+import json
 
 from helpers import get_county
 
@@ -32,6 +34,7 @@ class Stop(db.Model):
     turbo_url = db.Column(db.String)
     isStation = db.Column(db.Boolean)
     exception = db.Column(db.String)
+    names_in_osm = db.Column(db.String)
 
     def __init__(self, line_from_stops_txt, exception=None):
         self.id = int(line_from_stops_txt["stop_id"])
@@ -117,7 +120,7 @@ class Stop(db.Model):
         return payload
 
     def is_in_osm(self):
-        ''' Call Overpass to see if there is an object with the given name
+        ''' Call Overpass to see if there are public transportation stops
         close to the cordinates given '''
         short_name = self.get_short_name()
         logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
@@ -125,7 +128,19 @@ class Stop(db.Model):
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         overpass_response = r.json()
         stations = overpass_response.get("elements")
-        return len(stations)
+        names = [station["tags"]["name"] for station in stations if "tags" in station and "name" in station["tags"]]
+        self.names_in_osm = json.dumps(names)
+        matches = 0
+        runs = 0
+        for name in names:
+            for short_n in short_name.split("|"):
+                runs += 1
+                if difflib.SequenceMatcher(None, name, short_n).ratio() > 0.6:
+                    print(name, short_n)
+                    matches += 1
+                    break
+        print(runs)
+        return matches
 
     def to_dict(self):
         return {

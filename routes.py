@@ -9,6 +9,7 @@ import logging
 import sys
 import csv
 import config
+import json
 from math import log10
 
 from models import Stop, app, db
@@ -47,6 +48,7 @@ def pagination(number, city="Berlin"):
 
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
+        stop.names_in_osm = json.loads(stop.names_in_osm)
 
     return render_template("index.html",
                            city=city,
@@ -194,6 +196,9 @@ def match_exceptions():
 def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])
 
+@app.route('/stops.txt')
+def serve_stops():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 def recheck_batch(Stops):
     total = 0

@@ -47,9 +47,6 @@ def pagination(number, city="Berlin"):
     countys.sort()
 
     for stop in Stops:
-        # TODO: the following line is only there because there are invalid 
-        # data in my database and can be remove once a new deploy happens
-        stop.turbo_url = stop.turbo_url.replace('map.html', '') + '&R'
         stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",
@@ -67,9 +64,6 @@ def pagination(number, city="Berlin"):
 def search(query):
     """ Return a list with all the stops that match the query"""
     Stops = Stop.query.filter(Stop.name.like("%" + query + "%")).all()
-
-    for stop in Stops:
-        stop.turbo_url = stop.turbo_url
 
     return render_template("index.html", stops=Stops, config=config, pages=False)
 

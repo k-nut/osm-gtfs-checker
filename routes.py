@@ -48,7 +48,7 @@ def pagination(number, city="Berlin"):
 
     for stop in Stops:
         stop.turbo_url = stop.turbo_url
-        stop.names_in_osm = json.loads(stop.names_in_osm)
+        stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",
                            city=city,

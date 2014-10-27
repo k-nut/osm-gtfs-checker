@@ -47,7 +47,9 @@ def pagination(number, city="Berlin"):
     countys.sort()
 
     for stop in Stops:
-        stop.turbo_url = stop.turbo_url
+        # TODO: the following line is only there because there are invalid 
+        # data in my database and can be remove once a new deploy happens
+        stop.turbo_url = stop.turbo_url.replace('map.html', '') + '&R'
         stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",

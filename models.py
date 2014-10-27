@@ -47,8 +47,8 @@ class Stop(db.Model):
         else:
             self.isStaion = False
         self.exception = exception
-        self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
-            self.create_payload()["data"].replace("\n", "")
+        self.turbo_url = "http://overpass-turbo.eu/?Q=" + \
+            self.create_payload()["data"] + '&R'
         self.county = get_county(self.lat, self.lon)
 
     def update(self):

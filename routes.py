@@ -192,14 +192,15 @@ def match_exceptions():
 def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])
 
+
 @app.route('/stops.txt')
 def serve_stops():
     return send_from_directory(app.static_folder, request.path[1:])
 
+
 def recheck_batch(Stops):
     total = 0
     number_of_stops = len(Stops)
-    # get the number of digits we want to show
     digits = int(log10(number_of_stops)) + 1
     counter = 0
     for stop in Stops:

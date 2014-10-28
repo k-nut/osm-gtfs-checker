@@ -102,7 +102,6 @@ class Stop(db.Model):
         return short_name
 
     def create_payload(self):
-        short_name = self.get_short_name()
         payload = {"data": """
         [out:json];
         (

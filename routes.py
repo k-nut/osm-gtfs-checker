@@ -9,6 +9,7 @@ import logging
 import sys
 import csv
 import config
+import json
 from math import log10
 
 from models import Stop, app, db
@@ -17,7 +18,7 @@ from helpers import print_success, print_failure
 
 logging.basicConfig(filename="rechecks.log",
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
+                    datefmt='%Y-%m-%d %H:%M',
                     level=logging.INFO)
 if "--verbose" in sys.argv:
     console = logging.StreamHandler(sys.stdout)
@@ -42,12 +43,11 @@ def pagination(number, city="Berlin"):
     Stops = q[start:end]
     all_stops = len(q)
     matches = len([stop for stop in q if stop.matches > 0])
-    countys = list(set([stop.county for stop in
-                           Stop.query.all()]))
+    countys = list(set([stop.county for stop in Stop.query.all()]))
     countys.sort()
 
     for stop in Stops:
-        stop.turbo_url = stop.turbo_url
+        stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",
                            city=city,
@@ -64,9 +64,6 @@ def pagination(number, city="Berlin"):
 def search(query):
     """ Return a list with all the stops that match the query"""
     Stops = Stop.query.filter(Stop.name.like("%" + query + "%")).all()
-
-    for stop in Stops:
-        stop.turbo_url = stop.turbo_url
 
     return render_template("index.html", stops=Stops, config=config, pages=False)
 
@@ -94,8 +91,7 @@ def stops_in_bounding_box(show_only, north, east, south, west):
             Stop.lon.between(float(west), float(east)),
         ).all()
 
-    countys = list(set([stop.countys for stop in
-                           Stop.query.all()]))
+    countys = list(set([stop.county for stop in Stop.query.all()]))
     countys.sort()
     return render_template("index.html",
                            stops=result,
@@ -197,10 +193,14 @@ def serve_static():
     return send_from_directory(app.static_folder, request.path[1:])
 
 
+@app.route('/stops.txt')
+def serve_stops():
+    return send_from_directory(app.static_folder, request.path[1:])
+
+
 def recheck_batch(Stops):
     total = 0
     number_of_stops = len(Stops)
-    # get the number of digits we want to show
     digits = int(log10(number_of_stops)) + 1
     counter = 0
     for stop in Stops:

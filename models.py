@@ -11,6 +11,8 @@ import logging
 
 import os
 import datetime
+import difflib
+import json
 
 from helpers import get_county
 
@@ -32,6 +34,7 @@ class Stop(db.Model):
     turbo_url = db.Column(db.String)
     isStation = db.Column(db.Boolean)
     exception = db.Column(db.String)
+    names_in_osm = db.Column(db.String)
 
     def __init__(self, line_from_stops_txt, exception=None):
         self.id = int(line_from_stops_txt["stop_id"])
@@ -44,15 +47,9 @@ class Stop(db.Model):
         else:
             self.isStaion = False
         self.exception = exception
-        self.turbo_url = "http://overpass-turbo.eu/map.html?Q=" + \
-                         self.create_payload()["data"].replace("out skel;", "out;")
-        counties = get_county(self.lat, self.lon)
-        if 6 in counties:
-            self.county = counties[6]
-        elif 4 in counties:
-            self.county = counties[4]
-        else:
-            self.county = "Unknown"
+        self.turbo_url = "http://overpass-turbo.eu/?Q=" + \
+            self.create_payload()["data"] + '&R'
+        self.county = get_county(self.lat, self.lon)
 
     def update(self):
         self.matches = self.is_in_osm()
@@ -105,12 +102,24 @@ class Stop(db.Model):
         return short_name
 
     def create_payload(self):
-        short_name = self.get_short_name()
-        payload = {"data": '[output:json];node(around: 250, %f, %f)["name"~"%s"];out skel;' % (self.lat, self.lon, short_name)}
+        payload = {"data": """
+        [out:json];
+        (
+        node(around: 250, %(lat)f, %(lon)f)
+        ["highway"="bus_stop"];
+        node(around: 250, %(lat)f, %(lon)f)
+        ["railway"="tram_stop"];
+        node(around: 250, %(lat)f, %(lon)f)
+        ["railway"="station"];
+        node(around: 250, %(lat)f, %(lon)f)
+        ["public_transport"="stop_position"];
+        );
+        out;
+        """ % {'lat': self.lat, 'lon': self.lon}}
         return payload
 
     def is_in_osm(self):
-        ''' Call Overpass to see if there is an object with the given name
+        ''' Call Overpass to see if there are public transportation stops
         close to the cordinates given '''
         short_name = self.get_short_name()
         logging.info("[in_osm]  Name: %s; Checking: %s" % (self.name, short_name))
@@ -118,7 +127,15 @@ class Stop(db.Model):
         r = requests.get("http://overpass-api.de/api/interpreter", params=payload)
         overpass_response = r.json()
         stations = overpass_response.get("elements")
-        return len(stations)
+        names = [station["tags"]["name"] for station in stations if "tags" in station and "name" in station["tags"]]
+        self.names_in_osm = json.dumps(names)
+        matches = 0
+        for name in names:
+            for short_n in short_name.split("|"):
+                if difflib.SequenceMatcher(None, name, short_n).ratio() > 0.6:
+                    matches += 1
+                    break
+        return matches
 
     def to_dict(self):
         return {

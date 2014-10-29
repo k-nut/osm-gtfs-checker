@@ -27,7 +27,7 @@ class Stop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_run = db.Column(db.DateTime)
     name = db.Column(db.String(200), index=True)
-    matches = db.Column(db.Float)
+    matches = db.Column(db.Integer)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
     county = db.Column(db.String)

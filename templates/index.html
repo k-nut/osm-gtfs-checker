@@ -211,7 +211,7 @@
             {% endif %}
             <th title="{{stop.names_in_osm}}"> {{ stop.name }}</th>
             <th> {{ stop.id }}</th>
-            <th> {{ stop.matches }}</th>
+            <th> {{ stop.matches | int }}</th>
             <th> {{ stop.lat }}</th>
             <th> {{ stop.lon }}</th>
             <th> {{ stop.last_run }}</th>

@@ -128,8 +128,18 @@ class Stop(db.Model):
         overpass_response = r.json()
         stations = overpass_response.get("elements")
         names = [station["tags"]["name"] for station in stations if "tags" in station and "name" in station["tags"]]
+        vbb_ids_in_osm_data = [station["tags"]["ref:VBB"] for station in stations if "tags" in station and "ref:VBB" in station["tags"]]
         self.names_in_osm = json.dumps(names)
         matches = 0
+        for provider_id in vbb_ids_in_osm_data:
+            try:
+                if self.id == int(provider_id):
+                    matches += 1
+            except:
+                pass
+        if matches > 0:
+            return matches
+
         for name in names:
             for short_n in short_name.split("|"):
                 if difflib.SequenceMatcher(None, name, short_n).ratio() > 0.6:

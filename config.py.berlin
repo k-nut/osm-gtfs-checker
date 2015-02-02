@@ -1,5 +1,6 @@
 db_path = "./stops.db"
-stops_txt_url = "http://datenfragen.de/openvbb/GTFS_VBB_Okt2012/stops.txt"
+stops_txt_url = "http://osm-checker.k-nut.eu/stops.txt"
 name = "Berliner & Brandenburger OSM Haltestellen-Validator"
 initial_map_cordinates = {'lat': 52.52, 'lon': 13.41}
+attribution = "VBB Verkehrsverbund Berlin-Brandenburg GmbH (http://daten.berlin.de/datensaetze/vbb-fahrplandaten-dezember-2014-bis-dezember-2015)"
 

@@ -8,8 +8,8 @@ from helpers import print_success, print_failure, print_info
 
 def main():
     if len(sys.argv) < 2:
-        print("You need to pass the path to the logfile"
-              + " e.g logviewer.py recheckes.log")
+        print("You need to pass the path to the logfile" +
+              " e.g logviewer.py rechecks.log")
         return False
     path = sys.argv[1]
     logview(path)

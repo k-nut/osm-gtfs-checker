@@ -252,7 +252,3 @@ def get_stops():
             if counter % 20 == 0:
                 db.session.commit()
 
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run()

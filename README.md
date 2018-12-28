@@ -27,7 +27,7 @@ To install the dependencies and create the initial database use:
 
 Arguments
 ---------
-If you are in development mode you might want to pass ``` --verbose ``` to routes.py
+If you are in development mode you might want to pass ``` --verbose ``` to app.py
 
 License
 -------

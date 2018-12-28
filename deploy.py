@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from models import db
-import routes
+import app
 
 # create tables
 db.create_all()
 
 # import data
-routes.get_stops()
+app.get_stops()

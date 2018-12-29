@@ -48,6 +48,8 @@ class Stop(db.Model):
         self.exception = exception
         self.turbo_url = "http://overpass-turbo.eu/?Q=" + \
             self.create_payload()["data"] + '&R'
+
+    def query_and_set_county(self):
         self.county = get_county(self.lat, self.lon)
 
     def update(self):

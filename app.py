@@ -242,6 +242,7 @@ def get_stops():
         stop = Stop(line)
         if stop.is_station and stop.id not in all_ids:
             stop.matches = stop.is_in_osm()
+            stop.query_and_set_county()
             if stop.matches > 0:
                 print_success(stop.name + ": " + str(stop.matches))
             else:

@@ -240,7 +240,7 @@ def get_stops():
     counter = 0
     for line in reader:
         stop = Stop(line)
-        if stop.isStation and stop.id not in all_ids:
+        if stop.is_station and stop.id not in all_ids:
             stop.matches = stop.is_in_osm()
             if stop.matches > 0:
                 print_success(stop.name + ": " + str(stop.matches))

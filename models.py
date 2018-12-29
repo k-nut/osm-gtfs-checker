@@ -4,6 +4,7 @@
 import requests
 
 from flask import Flask
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 import config
@@ -21,6 +22,7 @@ path_to_db = os.path.expanduser(config.db_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class Stop(db.Model):

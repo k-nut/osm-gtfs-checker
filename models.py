@@ -18,8 +18,7 @@ import json
 from helpers import get_county
 
 app = Flask(__name__, instance_relative_config=True)
-path_to_db = os.path.expanduser(config.db_path)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + path_to_db
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

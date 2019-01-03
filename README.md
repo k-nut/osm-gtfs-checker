@@ -1,29 +1,40 @@
 [![Build Status](https://travis-ci.org/k-nut/osm-gtfs-checker.png?branch=master)](https://travis-ci.org/k-nut/osm-gtfs-checker)osm-gtfs-checker
+
+OSM GTFS Checker
 ===============
 
-Compares the public transit data in OSM to the data published by a GTFS-provider.
+Compares the public transit data in OpenStreetMap (OSM) to the data published by a GTFS-provider.
 
 
-
-Requirements
-------------
-- flask
-- flask-sqlalchemy
-- requests
-
-
-Setup
------
-There are two predefined config files. Those are for the city of Ulm and for Berlin. Simply rename one of them to ```config.py``` or create your own config file.
+Setup & config
+--------------
+First install the dependencies:
+```
+pip install -r requirements.txt
+```
 
 
-Deploy
-------
+There are two predefined config files. Those are for the city of Ulm and for Berlin. Simply rename one of them to `config.py` or create your own config file.
+You should also set a couple of environment variables:
 
-To install the dependencies and create the initial database use:
+```
+DATABASE_URL: #The URL to you database e.g. postgres://postgres@0.0.0.0:5432/osm-checker
+```
 
-    pip install -r requirements.txt
-    ./deploy.py
+After you configured your databse you should create the database by running:
+```
+flask db init
+flask db upgrade
+```
+
+Initial import
+--------------
+
+To run an initial import for all stops from your data provider run
+
+```
+./deploy.py
+```
 
 Arguments
 ---------

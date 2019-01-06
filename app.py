@@ -24,9 +24,8 @@ if "--verbose" in sys.argv:
 
 @app.route("/")
 def main():
-    ''' The main page '''
-    return pagination(1)
-
+    (first_county, ) = db.session.query(Stop.county).order_by(Stop.county).distinct().first()
+    return redirect("/city/{}/page/1".format(first_county))
 
 
 @app.route("/city/<city>/page/<int:number>")

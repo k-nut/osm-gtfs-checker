@@ -19,6 +19,11 @@ You should also set a couple of environment variables:
 
 ```
 DATABASE_URL: #The URL to you database e.g. postgres://postgres@0.0.0.0:5432/osm-checker
+OSM_CHECKER_APP_NAME="Ulmer OSM Haltestellen-Validator"
+OSM_CHECKER_LAT=48.35
+OSM_CHECKER_LON=10.00
+OSM_CHECKER_STOPS_TXT_URL="https://gtfs.swu.de/daten/stops.txt"
+OSM_CHECKER_ATTRIBUTION="The data provider (http://example.org)"
 ```
 
 After you configured your databse you should create the database by running:

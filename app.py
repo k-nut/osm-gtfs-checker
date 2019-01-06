@@ -28,32 +28,33 @@ def main():
     return pagination(1)
 
 
-@app.route("/city/<city>/page/<number>")
-def pagination(number, city="Berlin"):
-    """ Render only 100 stops for better overview"""
-    number = int(number)
-    start = (number - 1) * 50
-    end = number * 50
-    q = Stop.query\
-        .filter(Stop.county == city)\
-        .order_by("last_run desc").all()
-    Stops = q[start:end]
-    all_stops = len(q)
-    matches = len([stop for stop in q if stop.matches > 0])
-    countys = list(set([stop.county for stop in Stop.query.all()]))
-    countys.sort()
 
-    for stop in Stops:
+@app.route("/city/<city>/page/<int:number>")
+def pagination(number, city="Berlin"):
+    pagination = Stop.query\
+        .filter(Stop.county == city)\
+        .order_by("last_run desc")\
+        .paginate(page=number, per_page=50)
+    stops = pagination.items
+    matches_count = Stop.query\
+                        .filter(Stop.county == city)\
+                        .filter(Stop.matches > 0)\
+                        .count()
+    countys = [stop.county for stop in db.session.query(Stop.county)\
+                                         .order_by(Stop.county)\
+                                         .distinct()\
+                                         .all()]
+
+    for stop in stops:
         stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",
                            city=city,
-                           stops=Stops,
-                           pages=all_stops,
-                           this_page=number,
-                           matches_count=matches,
+                           stops=stops,
+                           matches_count=matches_count,
                            countys=countys,
-                           config=config
+                           config=config,
+                           pagination=pagination
                            )
 
 

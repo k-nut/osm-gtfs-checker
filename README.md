@@ -33,7 +33,7 @@ Initial import
 To run an initial import for all stops from your data provider run
 
 ```
-./deploy.py
+flask import-stops
 ```
 
 Arguments

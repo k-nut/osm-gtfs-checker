@@ -11,12 +11,12 @@ from helpers import print_success, print_failure
 from models import Stop, db
 
 
-def recheck_batch(Stops):
+def recheck_batch(stops):
     total = 0
-    number_of_stops = len(Stops)
+    number_of_stops = len(stops)
     digits = int(log10(number_of_stops)) + 1
     counter = 0
-    for stop in Stops:
+    for stop in stops:
         counter += 1
         print("%*i/%*i " % (digits, counter, digits, number_of_stops))
         out = recheck(stop.id, from_cm_line=True)
@@ -25,21 +25,31 @@ def recheck_batch(Stops):
     print_success("Insgesamt %i neue Treffer" % total)
 
 
-
 def recheck_all_missings_stops():
-    Stops = Stop.query.filter(Stop.matches < 1).all()
-    recheck_batch(Stops)
+    stops = Stop.query.filter(Stop.matches < 1).all()
+    recheck_batch(stops)
 
 
 def recheck_by_name(name):
-    Stops = Stop.query.filter(Stop.name.like("%" + name + "%"),
-                              Stop.matches < 1).all()
-    recheck_batch(Stops)
+    stops = Stop.query.filter(Stop.name.like("%" + name + "%")).all()
+    recheck_batch(stops)
 
 
 def recheck_all():
-    Stops = Stop.query.all()
-    recheck_batch(Stops)
+    stops = Stop.query.all()
+    recheck_batch(stops)
+
+
+@app.cli.command()
+@click.option("--all")
+@click.option("--name")
+def recheck_stops(all, name):
+    if all == "missing":
+        return recheck_all_missings_stops()
+    if all:
+        return recheck_all()
+    if name:
+        recheck_by_name(name)
 
 
 @app.cli.command()

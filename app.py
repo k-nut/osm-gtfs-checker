@@ -1,16 +1,13 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-import requests
 from flask import redirect, url_for, \
     render_template, jsonify, request, \
     send_from_directory
 import datetime
 import logging
 import sys
-import csv
 import config
 import json
-from math import log10
 
 from models import Stop, app, db
 from helpers import print_success, print_failure
@@ -27,36 +24,36 @@ if "--verbose" in sys.argv:
 
 @app.route("/")
 def main():
-    ''' The main page '''
-    return pagination(1)
+    (first_county, ) = db.session.query(Stop.county).order_by(Stop.county).distinct().first()
+    return redirect("/city/{}/page/1".format(first_county))
 
 
-@app.route("/city/<city>/page/<number>")
+@app.route("/city/<city>/page/<int:number>")
 def pagination(number, city="Berlin"):
-    """ Render only 100 stops for better overview"""
-    number = int(number)
-    start = (number - 1) * 50
-    end = number * 50
-    q = Stop.query\
+    pagination = Stop.query\
         .filter(Stop.county == city)\
-        .order_by("last_run desc").all()
-    Stops = q[start:end]
-    all_stops = len(q)
-    matches = len([stop for stop in q if stop.matches > 0])
-    countys = list(set([stop.county for stop in Stop.query.all()]))
-    countys.sort()
+        .order_by("last_run desc")\
+        .paginate(page=number, per_page=50)
+    stops = pagination.items
+    matches_count = Stop.query\
+                        .filter(Stop.county == city)\
+                        .filter(Stop.matches > 0)\
+                        .count()
+    countys = [stop.county for stop in db.session.query(Stop.county)\
+                                         .order_by(Stop.county)\
+                                         .distinct()\
+                                         .all()]
 
-    for stop in Stops:
+    for stop in stops:
         stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
 
     return render_template("index.html",
                            city=city,
-                           stops=Stops,
-                           pages=all_stops,
-                           this_page=number,
-                           matches_count=matches,
+                           stops=stops,
+                           matches_count=matches_count,
                            countys=countys,
-                           config=config
+                           config=config,
+                           pagination=pagination
                            )
 
 
@@ -197,62 +194,4 @@ def serve_static():
 def serve_stops():
     return send_from_directory(app.static_folder, request.path[1:])
 
-
-def recheck_batch(Stops):
-    total = 0
-    number_of_stops = len(Stops)
-    digits = int(log10(number_of_stops)) + 1
-    counter = 0
-    for stop in Stops:
-        counter += 1
-        print("%*i/%*i " % (digits, counter, digits, number_of_stops))
-        out = recheck(stop.id, from_cm_line=True)
-        if out > 0:
-            total += 1
-    print_success("Insgesamt %i neue Treffer" % total)
-
-
-def recheck_all_missings_stops():
-    Stops = Stop.query.filter(Stop.matches < 1).all()
-    recheck_batch(Stops)
-
-
-def recheck_by_name(name):
-    Stops = Stop.query.filter(Stop.name.like("%" + name + "%"),
-                              Stop.matches < 1).all()
-    recheck_batch(Stops)
-
-
-def recheck_all():
-    Stops = Stop.query.all()
-    recheck_batch(Stops)
-
-
-def get_stops():
-    ''' The initial query to set up the stop db '''
-    all_stops = Stop.query.all()
-    all_ids = [stop.id for stop in all_stops]
-    url = config.stops_txt_url
-    req = requests.get(url)
-    req.encoding = 'utf-8'
-    text = req.text.split('\n')
-    reader = csv.DictReader(text, delimiter=',', quotechar='"')
-    counter = 0
-    for line in reader:
-        stop = Stop(line)
-        if stop.isStation and stop.id not in all_ids:
-            stop.matches = stop.is_in_osm()
-            if stop.matches > 0:
-                print_success(stop.name + ": " + str(stop.matches))
-            else:
-                print_failure(stop.name + ":  0")
-            stop.last_run = datetime.datetime.now().replace(microsecond=0)
-            db.session.add(stop)
-            counter += 1
-            if counter % 20 == 0:
-                db.session.commit()
-
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run()
+import commands

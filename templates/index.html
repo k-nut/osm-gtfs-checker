@@ -196,7 +196,7 @@
           {% else %}
           <tr class="nomatch">
             {% endif %}
-            <th title="{{stop.names_in_osm}}"> {{ stop.name }}</th>
+            <th title="{{stop.formatted_osm_names}}"> {{ stop.name }}</th>
             <th> {{ stop.id }}</th>
             <th> {{ stop.matches | int }}</th>
             <th> {{ stop.lat }}</th>

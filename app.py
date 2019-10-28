@@ -44,9 +44,6 @@ def pagination(number, city="Berlin"):
                                          .distinct()\
                                          .all()]
 
-    for stop in stops:
-        stop.names_in_osm = ",".join(json.loads(stop.names_in_osm))
-
     return render_template("index.html",
                            city=city,
                            stops=stops,

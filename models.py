@@ -48,6 +48,10 @@ class Stop(db.Model):
         self.turbo_url = "http://overpass-turbo.eu/?Q=" + \
             self.create_payload()["data"] + '&R'
 
+    @property
+    def formatted_osm_names(self):
+        return ",".join(json.loads(self.names_in_osm))
+
     def query_and_set_county(self):
         self.county = get_county(self.lat, self.lon)
 

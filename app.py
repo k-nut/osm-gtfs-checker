@@ -56,12 +56,26 @@ def pagination(number, city="Berlin"):
                            )
 
 
-@app.route("/search/<query>")
-def search(query):
+@app.route("/search/<query>/page/<int:number>")
+def search(query, number):
     """ Return a list with all the stops that match the query"""
-    Stops = Stop.query.filter(Stop.name.like("%" + query + "%")).all()
+    pagination = Stop.query \
+        .filter(Stop.name.like("%" + query + "%")) \
+        .order_by("last_run desc") \
+        .paginate(page=number, per_page=5000)
+    stops = pagination.items
+    matches_count = Stop.query \
+        .filter(Stop.name.like("%" + query + "%")) \
+        .filter(Stop.matches > 0) \
+        .count()
 
-    return render_template("index.html", stops=Stops, config=config, pages=False)
+    return render_template("index.html",
+                           search_term=query,
+                           stops=stops,
+                           config=config,
+                           countys=get_all_counties(),
+                           matches_count=matches_count,
+                           pagination=pagination)
 
 
 @app.route("/stops/<show_only>/<north>/<east>/<south>/<west>")

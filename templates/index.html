@@ -111,7 +111,7 @@
               <li><a href="/map">Karte</a>
             </ul>
             <form class="navbar-search pull-right" action="javascript:search()">
-              <input class="search-query" id="search" type="search" placeholder="Haltestellen suchen..." />
+              <input class="search-query" id="search" type="search" placeholder="Haltestellen suchen..." value="{{search_term | default("")}}" />
             </form>
           </div>
         </div>

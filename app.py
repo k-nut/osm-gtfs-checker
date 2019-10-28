@@ -21,6 +21,12 @@ if "--verbose" in sys.argv:
     console = logging.StreamHandler(sys.stdout)
     logging.getLogger('').addHandler(console)
 
+def get_all_counties():
+    return [stop.county for stop in db.session.query(Stop.county) \
+        .order_by(Stop.county) \
+        .distinct() \
+        .all()]
+
 
 @app.route("/")
 def main():
@@ -39,16 +45,12 @@ def pagination(number, city="Berlin"):
                         .filter(Stop.county == city)\
                         .filter(Stop.matches > 0)\
                         .count()
-    countys = [stop.county for stop in db.session.query(Stop.county)\
-                                         .order_by(Stop.county)\
-                                         .distinct()\
-                                         .all()]
 
     return render_template("index.html",
                            city=city,
                            stops=stops,
                            matches_count=matches_count,
-                           countys=countys,
+                           countys=get_all_counties(),
                            config=config,
                            pagination=pagination
                            )

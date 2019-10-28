@@ -56,13 +56,13 @@ def pagination(number, city="Berlin"):
                            )
 
 
-@app.route("/search/<query>/page/<int:number>")
-def search(query, number):
+@app.route("/search/<query>")
+def search(query):
     """ Return a list with all the stops that match the query"""
     pagination = Stop.query \
         .filter(Stop.name.like("%" + query + "%")) \
         .order_by("last_run desc") \
-        .paginate(page=number, per_page=5000)
+        .paginate(page=1, per_page=5000)
     stops = pagination.items
     matches_count = Stop.query \
         .filter(Stop.name.like("%" + query + "%")) \

@@ -61,7 +61,7 @@ function count(){
 
 function search(){
   var query = $("#search").val();
-  window.location = "/search/" + query + "/page/1";
+  window.location = "/search/" + query;
 }
 
 function change_county(){

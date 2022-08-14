@@ -11,6 +11,7 @@ import json
 
 from models import Stop, app, db
 from helpers import print_success, print_failure
+from sqlalchemy import desc
 
 
 logging.basicConfig(filename="rechecks.log",
@@ -38,7 +39,7 @@ def main():
 def pagination(number, city="Berlin"):
     pagination = Stop.query\
         .filter(Stop.county == city)\
-        .order_by("last_run desc")\
+        .order_by(desc(Stop.last_run))\
         .paginate(page=number, per_page=50)
     stops = pagination.items
     matches_count = Stop.query\
@@ -61,7 +62,7 @@ def search(query):
     """ Return a list with all the stops that match the query"""
     pagination = Stop.query \
         .filter(Stop.name.like("%" + query + "%")) \
-        .order_by("last_run desc") \
+        .order_by(desc(Stop.last_run)) \
         .paginate(page=1, per_page=5000)
     stops = pagination.items
     matches_count = Stop.query \
